@@ -1,6 +1,6 @@
 exports.config = {
-  tests: "./tests/acceptance",
-  output: "./tests/output",
+  tests: "./tests/acceptance/**/*.js",
+  output: "./tests/_output/",
   helpers: {
     WebDriver: {
       url: "http://localhost",
@@ -8,14 +8,18 @@ exports.config = {
     }
   },
   plugins: {
+    autoDelay: {
+      enabled: true
+    },
     screenshotOnFail: {
       enabled: true
     },
     stepByStepReport: {
-      enabled: true
+      enabled: true,
+      output: "./tests/_output/"
     },
     allure: {
-      outputDir: "./tests/output"
+      outputDir: "./tests/_output"
     }
   },
   include: {},

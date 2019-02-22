@@ -19,7 +19,7 @@ Thumbs.db
 .DS_Store
 
 # codeceptjs
-tests/output/*
+tests/_output/*
 
 # node
 node_modules/*
