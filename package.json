@@ -1,0 +1,36 @@
+{
+  "name": "boilerplate-app",
+  "version": "1.0.0",
+  "description": "node boilerplate app configured with user management using postgresql",
+  "main": "index.js",
+  "scripts": {
+    "eslint": "eslint --format codeframe --ignore-path .gitignore **/*.js",
+    "mocha": "mocha -r @babel/register -r @babel/polyfill --recursive tests/unit/**/*.js",
+    "codecept": "node_modules/codeceptjs/bin/codecept.js",
+    "knex": "node_modules/knex/bin/cli.js",
+    "allure": "allure"
+  },
+  "author": "gazbond.co.uk",
+  "license": "MIT",
+  "dependencies": {
+    "knex": "^0.16.3",
+    "objection": "^1.6.1",
+    "pg": "^7.8.0"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.3.3",
+    "@babel/polyfill": "^7.2.5",
+    "@babel/preset-env": "^7.3.1",
+    "@babel/register": "^7.0.0",
+    "allure-commandline": "^2.9.0",
+    "babel-eslint": "^10.0.1",
+    "chai": "^4.2.0",
+    "codeceptjs": "^2.0.4",
+    "eslint": "^5.14.1",
+    "eslint-plugin-prettier": "^3.0.1",
+    "expect": "^24.1.0",
+    "mocha": "^5.2.0",
+    "prettier": "^1.16.4",
+    "webdriverio": "^5.4.17"
+  }
+}

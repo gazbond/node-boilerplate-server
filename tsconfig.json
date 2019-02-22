@@ -1,0 +1,8 @@
+{
+  "allowJs": true,
+  "compilerOptions": {
+    "target": "ES6"
+  },
+  "include": ["typings/*.d.ts"],
+  "exclude": ["node_modules", "**/node_modules/*"]
+}
