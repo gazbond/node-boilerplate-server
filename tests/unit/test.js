@@ -1,4 +1,4 @@
-import assert from "assert";
+import expect from "expect.js";
 import knex from "../knex";
 import models from "../../models";
 const db = models(knex);
@@ -17,6 +17,6 @@ after(async function() {
 describe("Initial tests", function() {
   it("tests User.id=1 loads from database", async function() {
     const user = await db.User.query().findById(1);
-    assert.strictEqual(user.name, "root");
+    expect(user.name).to.be("root");
   });
 });

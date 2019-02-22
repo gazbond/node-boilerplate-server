@@ -28,7 +28,7 @@
     "codeceptjs": "^2.0.4",
     "eslint": "^5.14.1",
     "eslint-plugin-prettier": "^3.0.1",
-    "expect": "^24.1.0",
+    "expect.js": "^0.3.1",
     "mocha": "^5.2.0",
     "prettier": "^1.16.4",
     "webdriverio": "^5.4.17"
