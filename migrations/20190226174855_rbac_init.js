@@ -1,29 +1,29 @@
 exports.up = async function(knex) {
-  await knex.schema.createTable("auth_rule", function(table) {
+  await knex.schema.createTable("rbac_auth_rule", function(table) {
     table.string("name", 64).primary();
     table.binary("data");
     table.timestamps();
   });
-  await knex.schema.createTable("auth_item", function(table) {
+  await knex.schema.createTable("rbac_auth_item", function(table) {
     table.string("name", 64).primary();
     table.text("description");
     table.string("rule_name", 64);
     table.binary("data");
     table.timestamps();
   });
-  await knex.schema.createTable("auth_item_child", function(table) {
+  await knex.schema.createTable("rbac_auth_item_child", function(table) {
     table.string("parent", 64);
     table.string("child", 64);
   });
-  await knex.schema.createTable("auth_assignment", function(table) {
+  await knex.schema.createTable("rbac_auth_assignment", function(table) {
     table.string("item_name");
     table.string("user_id");
   });
 };
 
 exports.down = async function(knex) {
-  await knex.schema.dropTable("auth_rule");
-  await knex.schema.dropTable("auth_item");
-  await knex.schema.dropTable("auth_item_child");
-  await knex.schema.dropTable("auth_assignment");
+  await knex.schema.dropTable("rbac_auth_rule");
+  await knex.schema.dropTable("rbac_auth_item");
+  await knex.schema.dropTable("rbac_auth_item_child");
+  await knex.schema.dropTable("rbac_auth_assignment");
 };

@@ -1,5 +1,5 @@
 exports.up = async function(knex) {
-  await knex.schema.createTable("users", function(table) {
+  await knex.schema.createTable("user_identity", function(table) {
     table.increments();
     table.string("username", 25);
     table.string("email", 255);
@@ -7,8 +7,15 @@ exports.up = async function(knex) {
     table.string("auth_key", 32);
     table.timestamps();
   });
+  await knex.schema.createTable("user_profile", function(table) {
+    table.increments();
+    table.string("phone", 25);
+    table.string("bio", 255);
+    table.timestamps();
+  });
 };
 
 exports.down = async function(knex) {
-  await knex.schema.dropTable("users");
+  await knex.schema.dropTable("user_identity");
+  await knex.schema.dropTable("user_profile");
 };

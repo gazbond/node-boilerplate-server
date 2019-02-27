@@ -1,13 +1,13 @@
-const { Model } = require("objection");
+const BaseModel = require("./BaseModel");
 
-module.exports = class User extends Model {
+module.exports = class User extends BaseModel {
   constructor() {
     super();
     this.username = null;
     this.email = null;
   }
   static get tableName() {
-    return "users";
+    return "user_identity";
   }
   static get idColumn() {
     return "id";
@@ -18,8 +18,8 @@ module.exports = class User extends Model {
       required: ["username", "email"],
       properties: {
         id: { type: "integer" },
-        username: { type: "string", minLength: 1, maxLength: 255 },
-        email: { type: "string", minLength: 1, maxLength: 255 }
+        username: { type: "string", minLength: 1, maxLength: 25 },
+        email: { type: "string", format: "email" }
       }
     };
   }
