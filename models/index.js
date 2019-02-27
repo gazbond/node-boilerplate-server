@@ -1,12 +1,7 @@
-import User from "./User";
+const User = require("./User");
 
-let models = null;
-
-export default function(knex) {
-  if (!models) {
-    models = {
-      User: User.bindKnex(knex)
-    };
-  }
-  return models;
-}
+module.exports = function(knex) {
+  return {
+    User: User.bindKnex(knex)
+  };
+};

@@ -1,4 +1,3 @@
-import knexfile from "../knexfile";
-import Knex from "knex";
 const environment = process.env.ENVIRONMENT || "testing";
-export default Knex(knexfile[environment]);
+const config = require("../knexfile")[environment];
+module.exports = require("knex")(config);

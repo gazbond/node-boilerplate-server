@@ -1,9 +1,9 @@
-import { Model } from "objection";
+const { Model } = require("objection");
 
-export default class User extends Model {
+module.exports = class User extends Model {
   constructor() {
     super();
-    this.name = null;
+    this.username = null;
     this.email = null;
   }
   static get tableName() {
@@ -12,4 +12,15 @@ export default class User extends Model {
   static get idColumn() {
     return "id";
   }
-}
+  static get jsonSchema() {
+    return {
+      type: "object",
+      required: ["username", "email"],
+      properties: {
+        id: { type: "integer" },
+        username: { type: "string", minLength: 1, maxLength: 255 },
+        email: { type: "string", minLength: 1, maxLength: 255 }
+      }
+    };
+  }
+};

@@ -1,7 +1,7 @@
-import expect from "expect.js";
-import knex from "../knex";
-import models from "../../models";
-const db = models(knex);
+const expect = require("expect.js");
+const objection = require("objection");
+const knex = require("../knex");
+const db = require("../../models")(knex);
 
 before(async function() {
   await knex.migrate.rollback();
@@ -17,6 +17,18 @@ after(async function() {
 describe("Initial tests", function() {
   it("tests User.id=1 loads from database", async function() {
     const user = await db.User.query().findById(1);
-    expect(user.name).to.be("root");
+    expect(user.username).to.be("root");
+  });
+  it("tests User validations", async function() {
+    try {
+      const user = await db.User.query().insert({
+        username: "",
+        email: ""
+      });
+    } catch (error) {
+      if (error instanceof objection.ValidationError) {
+        console.log(error);
+      }
+    }
   });
 });
