@@ -7,14 +7,20 @@ module.exports = class BaseModel extends DbErrors(Model) {
     this.$autoTimestamps = true;
   }
   $beforeInsert() {
-    if (this.$autoTimestamps) {
-      this.created_at = new Date().toISOString();
-      this.updated_at = new Date().toISOString();
-    }
+    const maybePromise = super.$beforeInsert(context);
+    return Promise.resolve(maybePromise).then(() => {
+      if (this.$autoTimestamps) {
+        this.created_at = new Date().toISOString();
+        this.updated_at = new Date().toISOString();
+      }
+    });
   }
   $beforeUpdate() {
-    if (this.$autoTimestamps) {
-      this.updated_at = new Date().toISOString();
-    }
+    const maybePromise = super.$beforeInsert(context);
+    return Promise.resolve(maybePromise).then(() => {
+      if (this.$autoTimestamps) {
+        this.updated_at = new Date().toISOString();
+      }
+    });
   }
 };
