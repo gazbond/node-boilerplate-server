@@ -19,13 +19,15 @@ module.exports = class User extends Password(BaseModel) {
         id: { type: "integer" },
         username: { type: "string", minLength: 1, maxLength: 25 },
         email: { type: "string", format: "email" },
-        password_hash: { type: "string", minLength: 0, maxLength: 60 }
+        password_hash: { type: "string", minLength: 0, maxLength: 60 },
+        auth_key: { type: "string", minLength: 0, maxLength: 32 }
       }
     };
   }
   $beforeInsert() {
     const maybePromise = super.$beforeInsert(context);
     return Promise.resolve(maybePromise).then(async () => {
+      // Set auth key to random string of length 32 (2 per hex i.e. 16 bytes)
       const buffer = await crypto.randomBytes(16);
       this.auth_key = buffer.toString("hex");
     });
