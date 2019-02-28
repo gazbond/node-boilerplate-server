@@ -1,11 +1,9 @@
 const BaseModel = require("./BaseModel");
+const Password = require("objection-password")({
+  passwordField: "password_hash"
+});
 
-module.exports = class User extends BaseModel {
-  constructor() {
-    super();
-    this.username = null;
-    this.email = null;
-  }
+module.exports = class User extends Password(BaseModel) {
   static get tableName() {
     return "user_identity";
   }
@@ -19,7 +17,8 @@ module.exports = class User extends BaseModel {
       properties: {
         id: { type: "integer" },
         username: { type: "string", minLength: 1, maxLength: 25 },
-        email: { type: "string", format: "email" }
+        email: { type: "string", format: "email" },
+        password_hash: { type: "string", minLength: 0, maxLength: 60 }
       }
     };
   }
