@@ -4,7 +4,7 @@
   "description": "node boilerplate app configured with user management using postgresql",
   "main": "index.js",
   "scripts": {
-    "eslint": "eslint --format codeframe --ignore-path .gitignore **/*.js",
+    "eslint": "eslint --format codeframe --ignore-pattern \"node_modules/**/*.js\" \"**/*.js\"",
     "mocha": "mocha --recursive tests/unit/**/*.js",
     "codecept": "node_modules/codeceptjs/bin/codecept.js",
     "knex": "node_modules/knex/bin/cli.js",
@@ -13,6 +13,7 @@
   "author": "gazbond.co.uk",
   "license": "MIT",
   "dependencies": {
+    "crypto-promise": "^2.1.0",
     "knex": "^0.16.3",
     "objection": "^1.6.1",
     "objection-db-errors": "^1.0.0",
