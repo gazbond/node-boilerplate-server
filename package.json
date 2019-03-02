@@ -2,23 +2,35 @@
   "name": "boilerplate-app",
   "version": "1.0.0",
   "description": "node boilerplate app configured with user management using postgresql",
-  "main": "index.js",
   "scripts": {
     "eslint": "eslint --format codeframe --ignore-pattern \"node_modules/**/*.js\" \"**/*.js\"",
     "mocha": "mocha --recursive tests/unit/**/*.js",
-    "codecept": "node_modules/codeceptjs/bin/codecept.js",
-    "knex": "node_modules/knex/bin/cli.js",
-    "allure": "allure"
+    "codecept": "codeceptjs",
+    "allure": "allure",
+    "knex": "knex",
+    "start": "nodemon app.js",
+    "start:docker": "npm install bcrypt --quiet && npm start"
   },
   "author": "gazbond.co.uk",
   "license": "MIT",
   "dependencies": {
+    "bcrypt": "^3.0.4",
+    "body-parser": "^1.18.3",
     "crypto-promise": "^2.1.0",
+    "express": "^4.16.4",
+    "express-flash": "0.0.2",
+    "express-session": "^1.15.6",
+    "express-status-monitor": "^1.2.3",
+    "express-validator": "^5.3.1",
     "knex": "^0.16.3",
+    "morgan": "^1.9.1",
     "objection": "^1.6.1",
     "objection-db-errors": "^1.0.0",
     "objection-password": "^2.0.0",
-    "pg": "^7.8.0"
+    "passport": "^0.4.0",
+    "path": "^0.12.7",
+    "pg": "^7.8.0",
+    "serve-favicon": "^2.5.0"
   },
   "devDependencies": {
     "@babel/core": "^7.3.3",
@@ -32,6 +44,7 @@
     "eslint-plugin-prettier": "^3.0.1",
     "expect.js": "^0.3.1",
     "mocha": "^5.2.0",
+    "nodemon": "^1.18.10",
     "prettier": "^1.16.4",
     "webdriverio": "^5.4.17"
   }

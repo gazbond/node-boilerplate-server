@@ -3,6 +3,6 @@
 Feature("testing");
 
 Scenario("test something", I => {
-  I.amOnPage("http://google.co.uk");
-  I.see("Google");
+  I.amOnPage("/");
+  I.see("Cannot GET /");
 });
