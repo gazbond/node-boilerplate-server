@@ -8,8 +8,9 @@
     "codecept": "codeceptjs",
     "allure": "allure",
     "knex": "knex",
-    "start": "nodemon app.js",
-    "start:docker": "npm install bcrypt --quiet && npm start"
+    "start": "node app.js",
+    "start:nodemon": "nodemon app.js",
+    "start:docker": "npm install bcrypt --quiet && npm start:nodemon"
   },
   "author": "gazbond.co.uk",
   "license": "MIT",
