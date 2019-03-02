@@ -3,7 +3,9 @@ exports.config = {
   output: "./tests/_output/",
   helpers: {
     WebDriver: {
-      url: "http://localhost",
+      host: "chrome",
+      url: "http://node",
+      keepCookies: true,
       browser: "chrome"
     }
   },

@@ -2,6 +2,7 @@ module.exports = {
   development: {
     client: "postgresql",
     connection: {
+      host: "postgres",
       database: "node_app",
       user: "postgres",
       password: "postgres"
@@ -17,6 +18,7 @@ module.exports = {
   testing: {
     client: "postgresql",
     connection: {
+      host: "postgres",
       database: "node_app_test",
       user: "postgres",
       password: "postgres"
