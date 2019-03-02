@@ -24,8 +24,8 @@ module.exports = class User extends Password(BaseModel) {
       }
     };
   }
-  $beforeInsert() {
-    const maybePromise = super.$beforeInsert(context);
+  $beforeInsert(queryContext) {
+    const maybePromise = super.$beforeInsert(queryContext);
     return Promise.resolve(maybePromise).then(async () => {
       // Set auth key to random string of length 32 (2 per hex i.e. 16 bytes)
       const buffer = await crypto.randomBytes(16);
