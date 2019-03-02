@@ -10,7 +10,7 @@
     "knex": "knex",
     "start": "node app.js",
     "start:nodemon": "nodemon app.js",
-    "start:docker": "npm install bcrypt --quiet && npm start:nodemon"
+    "start:docker": "npm install bcrypt --quiet && npm run start:nodemon"
   },
   "author": "gazbond.co.uk",
   "license": "MIT",

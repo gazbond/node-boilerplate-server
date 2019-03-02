@@ -50,5 +50,5 @@ const app = express();
 app.use(favicon("public/favicon.ico"));
 app.use("/", routerPublic);
 app.use("/api/", routerApi);
-const port = 8080;
+const port = 80;
 app.listen(port, () => console.log(`Node app listening on port ${port}!`));

@@ -1,17 +1,17 @@
 version: '2'
 services:
-    # node:
-    #     image: node:11.10.0
-    #     working_dir: /app
-    #     command: npm run start:docker
-    #     volumes:
-    #         - ./:/app:delegated
-    #     environment:
-    #         - NODE_ENV=development
-    #     depends_on:
-    #         - postgres
-    #     ports: 
-    #         - 8080:80
+    node:
+        image: node:11.10.0
+        working_dir: /app
+        command: npm run start:docker
+        volumes:
+            - ./:/app:delegated
+        environment:
+            - NODE_ENV=development
+        depends_on:
+            - postgres
+        ports: 
+            - 8080:80
     postgres:
         image: postgres:11.1
         restart: always
