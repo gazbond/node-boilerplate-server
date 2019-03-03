@@ -4,6 +4,7 @@
   "description": "node boilerplate app configured with user management using postgresql",
   "scripts": {
     "eslint": "eslint --format codeframe --ignore-pattern \"node_modules/**/*.js\" \"**/*.js\"",
+    "eslint-fix": "eslint --fix --ignore-pattern \"node_modules/**/*.js\" \"**/*.js\"",
     "mocha": "mocha --recursive tests/unit/**/*.js",
     "codecept": "codeceptjs",
     "test": "npm run eslint && npm run mocha && npm run codecept run",
