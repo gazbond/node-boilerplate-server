@@ -21,8 +21,9 @@ exports.up = async function(knex) {
   });
   await knex.schema.createTable("rbac_assignment", function(table) {
     table.string("item_name");
-    table.string("user_id");
+    table.integer("user_id");
     table.foreign("item_name").references("rbac_item.name");
+    table.foreign("user_id").references("user_identity.id");
   });
 };
 

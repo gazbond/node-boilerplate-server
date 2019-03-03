@@ -11,7 +11,9 @@ exports.up = async function(knex) {
     table.increments();
     table.string("phone", 25);
     table.string("bio", 255);
+    table.integer("user_id");
     table.timestamps();
+    table.foreign("user_id").references("user_identity.id");
   });
 };
 
