@@ -1,6 +1,8 @@
 {
     "cSpell.enabled": true,
-    "mochaExplorer.files": "tests/unit/**/*.js",
+    // "mochaExplorer.files": "tests/unit/**/*.js",
     "eslint.enable": true,
-    "npm-scripts.showStartNotification": false
+    "files.exclude": {
+        "node_modules": true
+    }
 }
