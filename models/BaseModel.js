@@ -1,7 +1,7 @@
 const { Model } = require("objection");
 const { DbErrors } = require("objection-db-errors");
-const visibilityPlugin = require("objection-visibility").default;
-const BaseClass = DbErrors(visibilityPlugin(Model));
+const VisibilityPlugin = require("objection-visibility").default;
+const BaseClass = DbErrors(VisibilityPlugin(Model));
 
 module.exports = class BaseModel extends BaseClass {
   constructor() {
