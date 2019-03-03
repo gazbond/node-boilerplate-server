@@ -1,4 +1,3 @@
-// Generated with npm run codecept def
 
 type ICodeceptCallback = (i: CodeceptJS.I) => void;
 
@@ -276,6 +275,12 @@ declare namespace CodeceptJS {
     runInWeb(fn: Function) : void,
     debug(msg: string) : void,
     debugSection(section: string, msg: string) : void,
+    setRequestTimeout(newTimeout: string) : void,
+    sendGetRequest(url: string, headers?: string) : void,
+    sendPostRequest(url: string, payload?: string, headers?: string) : void,
+    sendPatchRequest(url: string, payload: string, headers?: string) : void,
+    sendPutRequest(url: string, payload?: string, headers?: string) : void,
+    sendDeleteRequest(url: string, headers?: string) : void,
     say: () => any; 
     retryStep(opts: string) : void,
 

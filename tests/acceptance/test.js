@@ -1,8 +1,13 @@
 /// <reference path="../../typings/steps.d.ts" />
 
-Feature("testing");
+Feature("Initial tests");
 
-Scenario("test something", I => {
-  I.amOnPage("/");
-  I.see("Cannot GET /");
+Scenario("test user login route is present", I => {
+  I.amOnPage("/user/login");
+  I.see("Nothing here yet :(");
+});
+
+Scenario("test user api route is present", I => {
+  I.sendGetRequest("/users");
+  I.saveScreenshot("screenshot.png");
 });
