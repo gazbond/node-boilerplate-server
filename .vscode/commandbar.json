@@ -1,0 +1,43 @@
+{
+  "skipTerminateQuickPick": true,
+  "skipSwitchToOutput": false,
+  "skipErrorMessage": true,
+  "commands": [
+    {
+      "text": "mocha",
+      "tooltip": "run mocha tests in docker container",
+      "color": "yellow",
+      "command": "docker exec node-boilerplate-app_node_1 npm run mocha",
+      "alignment": "left",
+      "skipTerminateQuickPick": false,
+      "priority": 0
+    },
+    {
+      "text": "codecept",
+      "tooltip": "run codecept tests in docker container",
+      "color": "yellow",
+      "command": "docker exec node-boilerplate-app_node_1 npm run codecept run",
+      "alignment": "left",
+      "skipTerminateQuickPick": false,
+      "priority": 0
+    },
+    {
+      "text": "migrate",
+      "tooltip": "run knex migrations in docker container",
+      "color": "yellow",
+      "command": "docker exec node-boilerplate-app_node_1 npm run knex migrate:latest",
+      "alignment": "left",
+      "skipTerminateQuickPick": false,
+      "priority": 0
+    },
+    {
+      "text": "seed",
+      "tooltip": "run knex seeds in docker container",
+      "color": "yellow",
+      "command": "docker exec node-boilerplate-app_node_1 npm run knex seed:run",
+      "alignment": "left",
+      "skipTerminateQuickPick": false,
+      "priority": 0
+    }
+  ]
+}
