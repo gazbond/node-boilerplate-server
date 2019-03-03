@@ -1,7 +1,9 @@
 const { Model } = require("objection");
 const { DbErrors } = require("objection-db-errors");
+const visibilityPlugin = require("objection-visibility").default;
+const BaseClass = DbErrors(visibilityPlugin(Model));
 
-module.exports = class BaseModel extends DbErrors(Model) {
+module.exports = class BaseModel extends BaseClass {
   constructor() {
     super();
     this.$autoTimestamps = true;

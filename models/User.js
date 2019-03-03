@@ -24,6 +24,9 @@ module.exports = class User extends Password(BaseModel) {
       }
     };
   }
+  static get visible() {
+    return ["id", "username", "email", "auth_key", "created_at", "updated_at"];
+  }
   $beforeInsert(queryContext) {
     const maybePromise = super.$beforeInsert(queryContext);
     return Promise.resolve(maybePromise).then(async () => {
