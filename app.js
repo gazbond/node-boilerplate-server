@@ -29,7 +29,7 @@ const routerApi = express.Router();
 const routeRESTful = (route, endpoint) => {
   routerApi.get(route, endpoint["actionIndex"]);
   routerApi.get(route + "/:id", endpoint["actionView"]);
-  routerApi.post(route, endpoint["actionInsert"]);
+  routerApi.post(route, endpoint["actionCreate"]);
   routerApi.put(route + "/:id", endpoint["actionUpdate"]);
   routerApi.delete(route, endpoint["actionDelete"]);
 };

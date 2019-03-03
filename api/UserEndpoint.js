@@ -18,7 +18,7 @@ module.exports = class UserEndpoint {
     const user = await this.User.query().findById(req.params.id);
     res.status(200).send(user);
   }
-  async actionInsert(req, res) {
+  async actionCreate(req, res) {
     res.status(501).end();
   }
   async actionUpdate(req, res) {
