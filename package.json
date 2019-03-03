@@ -6,11 +6,12 @@
     "eslint": "eslint --format codeframe --ignore-pattern \"node_modules/**/*.js\" \"**/*.js\"",
     "mocha": "mocha --recursive tests/unit/**/*.js",
     "codecept": "codeceptjs",
+    "test": "npm run eslint && npm run mocha && npm run codecept run",
     "allure": "allure",
     "knex": "knex",
     "start": "node app.js",
-    "start:nodemon": "nodemon app.js",
-    "start:docker": "npm install bcrypt --quiet && npm run start:nodemon"
+    "debug": "nodemon --inspect=0.0.0.0 app.js",
+    "docker": "npm install --quiet && npm run debug"
   },
   "author": "gazbond.co.uk",
   "license": "MIT",
