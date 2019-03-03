@@ -5,10 +5,15 @@ module.exports = class UserEndpoint {
   /**
    * @param {User} model User model class i.e. db.User
    */
-  constructor(model, config = {}) {
+  constructor(model) {
     this.knex = model.knex;
     this.User = model;
-    Object.assign(this, config);
+    // To get 'this' in instance methods:
+    this.actionIndex = this.actionIndex.bind(this);
+    this.actionView = this.actionView.bind(this);
+    this.actionCreate = this.actionCreate.bind(this);
+    this.actionUpdate = this.actionUpdate.bind(this);
+    this.actionDelete = this.actionDelete.bind(this);
   }
   async actionIndex(req, res) {
     const users = await this.User.query();

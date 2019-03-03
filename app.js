@@ -35,12 +35,12 @@ const routeRESTful = (route, endpoint) => {
 };
 
 const UserController = require("./public/UserController");
-const userController = new UserController(db.User, {});
+const userController = new UserController(db.User);
 routeGetAndPost("/user/login", userController.actionLogin);
 routeGetAndPost("/user/register", userController.actionRegister);
 
 const UserEndpoint = require("./api/UserEndpoint");
-const userEndpoint = new UserEndpoint(db.User, {});
+const userEndpoint = new UserEndpoint(db.User);
 routeRESTful("/users", userEndpoint);
 
 /**
@@ -51,4 +51,4 @@ app.use(favicon("public/favicon.ico"));
 app.use("/", routerPublic);
 app.use("/api/", routerApi);
 const port = 80;
-app.listen(port, () => console.log(`Node app listening on port ${port}!`));
+app.listen(port, () => console.log(`Node app listening on port ${port}`));
