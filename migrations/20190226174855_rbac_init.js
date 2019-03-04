@@ -28,8 +28,8 @@ exports.up = async function(knex) {
 };
 
 exports.down = async function(knex) {
-  await knex.schema.dropTable("rbac_rule");
-  await knex.schema.dropTable("rbac_item");
-  await knex.schema.dropTable("rbac_item_child");
   await knex.schema.dropTable("rbac_assignment");
+  await knex.schema.dropTable("rbac_item_child");
+  await knex.schema.dropTable("rbac_item");
+  await knex.schema.dropTable("rbac_rule");
 };
