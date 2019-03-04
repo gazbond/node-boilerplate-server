@@ -4,7 +4,6 @@ const knex = require("../knex");
 const db = require("../../models")(knex);
 
 before(async function() {
-  await knex.migrate.rollback();
   await knex.migrate.latest();
 });
 beforeEach(async function() {
