@@ -4,13 +4,22 @@
   "skipErrorMessage": true,
   "commands": [
     {
-      "text": "mocha",
-      "tooltip": "run mocha tests in docker container",
+      "text": "mocha-unit",
+      "tooltip": "run mocha unit tests in docker container",
       "color": "yellow",
-      "command": "docker exec node-boilerplate-app_node_1 npm run mocha",
+      "command": "docker exec node-boilerplate-app_node_1 npm run mocha-unit",
       "alignment": "left",
       "skipTerminateQuickPick": false,
       "priority": 1
+    },
+    {
+      "text": "mocha-api",
+      "tooltip": "run mocha api tests in docker container",
+      "color": "yellow",
+      "command": "docker exec node-boilerplate-app_node_1 npm run mocha-api",
+      "alignment": "left",
+      "skipTerminateQuickPick": false,
+      "priority": 2
     },
     {
       "text": "codecept",
@@ -19,7 +28,7 @@
       "command": "docker exec node-boilerplate-app_node_1 npm run codecept run --steps --verbose",
       "alignment": "left",
       "skipTerminateQuickPick": false,
-      "priority": 2
+      "priority": 3
     },
     {
       "text": "seed",
@@ -28,7 +37,7 @@
       "command": "docker exec node-boilerplate-app_node_1 npm run knex seed:run",
       "alignment": "left",
       "skipTerminateQuickPick": false,
-      "priority": 3
+      "priority": 4
     },
     {
       "text": "migrate",
@@ -37,7 +46,7 @@
       "command": "docker exec node-boilerplate-app_node_1 npm run knex migrate:latest",
       "alignment": "left",
       "skipTerminateQuickPick": false,
-      "priority": 4
+      "priority": 5
     },
     {
       "text": "eslint-fix",
@@ -46,7 +55,7 @@
       "command": "npm run eslint-fix",
       "alignment": "left",
       "skipTerminateQuickPick": false,
-      "priority": 5
+      "priority": 6
     }
   ]
 }
