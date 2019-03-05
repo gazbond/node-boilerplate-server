@@ -18,6 +18,6 @@ exports.up = async function(knex) {
 };
 
 exports.down = async function(knex) {
-  await knex.schema.dropTable("user_identity");
   await knex.schema.dropTable("user_profile");
+  await knex.schema.dropTable("user_identity");
 };

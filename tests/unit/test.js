@@ -51,6 +51,7 @@ describe("Initial tests", function() {
     // Test insert
     const insertUser = await db.User.query()
       .insert({
+        id: 3,
         username: "gaz",
         email: "test@gazbond.co.uk",
         password_hash: "password"
