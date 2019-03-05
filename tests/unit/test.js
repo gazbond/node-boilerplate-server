@@ -14,9 +14,13 @@ after(async function() {
 });
 
 describe("Initial tests", function() {
-  it("tests User.id=1 loads from database", async function() {
-    const user = await db.User.query().findById(1);
-    expect(user.username).to.be("root");
+  it("tests User.username=root loads from database", async function() {
+    const user = await db.User.query()
+      .where({
+        username: "root"
+      })
+      .first();
+    expect(user.email).to.be("dev@gazbond.co.uk");
   });
   it("tests User fails validation", async function() {
     try {
@@ -51,7 +55,6 @@ describe("Initial tests", function() {
     // Test insert
     const insertUser = await db.User.query()
       .insert({
-        id: 3,
         username: "gaz",
         email: "test@gazbond.co.uk",
         password_hash: "password"
