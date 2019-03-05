@@ -22,10 +22,9 @@ exports.config = {
     },
     stepByStepReport: {
       enabled: true,
+      deleteSuccessful: false,
+      fullPageScreenshots: true,
       output: "./tests/_output/"
-    },
-    allure: {
-      outputDir: "./tests/_output"
     }
   },
   include: {},

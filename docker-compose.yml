@@ -3,8 +3,8 @@ services:
     node:
         image: node:11.10.0
         working_dir: /app
-        # Switch to 'npm run docker' for install (fix for mac vs linux npm binaries)
-        command: npm run debug
+        # Use 'npm run start-docker' to fix npm problems
+        command: npm run start-debug
         volumes:
             - ./:/app:delegated
         environment:
