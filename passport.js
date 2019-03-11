@@ -1,16 +1,13 @@
 const passport = require("passport");
-const passportJwt = require("passport-jwt");
-const JwtStrategy = passportJwt.Strategy;
-const ExtractJwt = passportJwt.ExtractJwt;
+const JwtCookieComboStrategy = require("passport-jwt-cookiecombo");
 
 const User = require("./models/User");
 const SECRET_OR_KEY = "md6a-gbs89le72ha8we7js-zo-awns67uw";
 const EXPIRES = "2 days";
 
-const strategy = new JwtStrategy(
+const strategy = new JwtCookieComboStrategy(
   {
-    jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
-    secretOrKey: SECRET_OR_KEY
+    secretOrPublicKey: SECRET_OR_KEY
   },
   async (payload, next) => {
     // @ts-ignore
