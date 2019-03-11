@@ -24,6 +24,7 @@
     "express-session": "^1.15.6",
     "express-status-monitor": "^1.2.3",
     "express-validator": "^5.3.1",
+    "jsonwebtoken": "^8.5.0",
     "knex": "^0.16.3",
     "morgan": "^1.9.1",
     "objection": "^1.6.1",
@@ -31,6 +32,7 @@
     "objection-password": "^2.0.0",
     "objection-visibility": "^0.4.0",
     "passport": "^0.4.0",
+    "passport-jwt": "^4.0.0",
     "path": "^0.12.7",
     "pg": "^7.8.0",
     "serve-favicon": "^2.5.0"
