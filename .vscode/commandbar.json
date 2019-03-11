@@ -47,15 +47,6 @@
       "alignment": "left",
       "skipTerminateQuickPick": false,
       "priority": 5
-    },
-    {
-      "text": "fix",
-      "tooltip": "fix everthing with eslint",
-      "color": "yellow",
-      "command": "npm run lint-fix",
-      "alignment": "left",
-      "skipTerminateQuickPick": false,
-      "priority": 6
     }
   ]
 }
