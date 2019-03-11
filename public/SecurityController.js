@@ -10,33 +10,52 @@ module.exports = class SecurityController {
     // Options:
     this.loginRoute = "/security/login";
     this.registerRoute = "/security/register";
+    // Validation:
+    this.loginValidation = [
+      check("login").exists({
+        checkNull: true,
+        checkFalsy: true
+      }),
+      check("login").isAlphanumeric(),
+      check("login").isLength({ min: 3, max: 25 }),
+      check("password").exists({
+        checkNull: true,
+        checkFalsy: true
+      }),
+      check("password").isAlphanumeric(),
+      check("password").isLength({ min: 4 })
+    ];
     // To get 'this' in instance methods:
-    this.initRoute = this.initRoute.bind(this);
-    this.actionLogin = this.actionLogin.bind(this);
-    this.actionRegister = this.actionRegister.bind(this);
+    this.initRoutes = this.initRoutes.bind(this);
+    this.loginGet = this.loginGet.bind(this);
+    this.loginPost = this.loginPost.bind(this);
+    this.register = this.register.bind(this);
   }
-  async initRoute(router) {
+  initRoutes(router) {
     const newRouter = express.Router();
     // Routes:
-    newRouter.get(this.loginRoute, this.actionLogin);
-    newRouter.post(this.loginRoute, this.actionLogin);
-    newRouter.get(this.registerRoute, this.actionRegister);
-    newRouter.post(this.registerRoute, this.actionRegister);
+    newRouter.get(this.loginRoute, this.loginGet);
+    newRouter.post(this.loginRoute, this.loginValidation, this.loginPost);
+    newRouter.get(this.registerRoute, this.register);
+    newRouter.post(this.registerRoute, this.register);
     router.use(newRouter);
   }
-  async actionLogin(req, res) {
-    // Check req params
-    if (!req.body.login || !req.body.password) {
-      return res.status(400).send("Required field(s) missing");
-    }
-    check("login").isAlphanumeric();
-    check("login").isLength({ min: 3, max: 25 });
-    check("password").isAlphanumeric();
-    check("password").isLength({ min: 4 });
-    // Send validation errors
+  // Util:
+  renderParams(req, errors) {
+    return {
+      errors: errors,
+      login: req.body.login ? req.body.login : "",
+      password: req.body.password ? req.body.password : ""
+    };
+  }
+  async loginGet(req, res) {
+    return res.render("login", this.renderParams(req, []));
+  }
+  async loginPost(req, res) {
+    // Check validation errors
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
-      return res.status(400).json({ errors: errors.array() });
+      return res.render("login", this.renderParams(req, errors.array()));
     }
     // Try loading user
     // @ts-ignore
@@ -46,22 +65,41 @@ module.exports = class SecurityController {
       .first();
     // User not found
     if (!user) {
-      return res.status(401).send("Incorrect login");
+      return res.render(
+        "login",
+        this.renderParams(req, [{ param: "password", msg: "Incorrect login" }])
+      );
     }
     // Incorrect password
     const validPassword = await user.verifyPassword(req.body.password);
     if (!validPassword) {
-      return res.status(401).send("Incorrect password");
+      return res.render(
+        "login",
+        this.renderParams(req, [
+          { param: "password", msg: "Incorrect password" }
+        ])
+      );
     }
     // Generate token
     const payload = { id: user.id };
     const token = await jwt.sign(payload, passport.SECRET_OR_KEY, {
       expiresIn: passport.EXPIRES
     });
+    // Send Authorization header
+    res.header("Authorization", token);
+    // Send Set-Cookie header
+    res.cookie("Authorization", token, {
+      httpOnly: true,
+      sameSite: true
+    });
+
     // Send Token
-    res.send(token);
+    return res.json({
+      token: token,
+      created_at: new Date().toISOString
+    });
   }
-  async actionRegister(req, res) {
+  async register(req, res) {
     return res.status(501).end();
   }
 };
