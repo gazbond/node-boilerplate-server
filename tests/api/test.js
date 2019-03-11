@@ -4,9 +4,7 @@ const chaiHttp = require("chai-http");
 const should = chai.should();
 chai.use(chaiHttp);
 
-const objection = require("objection");
 const knex = require("../knex");
-const db = require("../../models")(knex);
 
 before(async function() {
   await knex.migrate.latest();

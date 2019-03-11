@@ -1,7 +1,12 @@
 const expect = require("expect.js");
+const chai = require("chai");
+const chaiHttp = require("chai-http");
+const should = chai.should();
+chai.use(chaiHttp);
+
 const objection = require("objection");
 const knex = require("../knex");
-const db = require("../../models")(knex);
+const User = require("../../models/User");
 
 before(async function() {
   await knex.migrate.latest();
@@ -15,7 +20,8 @@ after(async function() {
 
 describe("Initial tests", function() {
   it("tests User.username=root loads from database", async function() {
-    const user = await db.User.query()
+    // @ts-ignore
+    const user = await User.query()
       .where({
         username: "root"
       })
@@ -24,7 +30,8 @@ describe("Initial tests", function() {
   });
   it("tests User fails validation", async function() {
     try {
-      const user = await db.User.query().insert({
+      // @ts-ignore
+      const user = await User.query().insert({
         username: "",
         email: "not-an-email"
       });
@@ -53,7 +60,8 @@ describe("Initial tests", function() {
   });
   it("tests User creates timestamps and hashes password on insert and update", async function() {
     // Test insert
-    const insertUser = await db.User.query()
+    // @ts-ignore
+    const insertUser = await User.query()
       .insert({
         username: "gaz",
         email: "test@gazbond.co.uk",
@@ -67,7 +75,8 @@ describe("Initial tests", function() {
     // Test update (patch)
     const password_hash = insertUser.password_hash;
     const updated_at = insertUser.updated_at;
-    const updateUser = await db.User.query().patchAndFetchById(insertUser.id, {
+    // @ts-ignore
+    const updateUser = await User.query().patchAndFetchById(insertUser.id, {
       username: "gazb"
     });
     expect(insertUser.password_hash).to.equal(password_hash);
