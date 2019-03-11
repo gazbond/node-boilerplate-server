@@ -95,8 +95,9 @@ module.exports = class SecurityController {
 
     // Send Token
     return res.json({
-      token: token,
-      created_at: new Date().toISOString
+      Authorization: token,
+      issued_at: new Date().toISOString,
+      expires_at: passport.EXPIRES
     });
   }
   async register(req, res) {

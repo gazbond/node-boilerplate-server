@@ -21,7 +21,9 @@ const strategy = new JwtCookieComboStrategy(
 passport.use(strategy);
 
 const initialize = passport.initialize();
-const authenticate = passport.authenticate("jwt", { session: false });
+const authenticate = passport.authenticate("jwt-cookiecombo", {
+  session: false
+});
 
 module.exports = {
   SECRET_OR_KEY: SECRET_OR_KEY,
