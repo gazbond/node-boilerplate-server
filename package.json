@@ -19,7 +19,9 @@
     "bcrypt": "^3.0.4",
     "body-parser": "^1.18.3",
     "crypto-promise": "^2.1.0",
+    "ejs": "^2.6.1",
     "express": "^4.16.4",
+    "express-ejs-layouts": "^2.5.0",
     "express-flash": "0.0.2",
     "express-session": "^1.15.6",
     "express-status-monitor": "^1.2.3",
@@ -32,7 +34,7 @@
     "objection-password": "^2.0.0",
     "objection-visibility": "^0.4.0",
     "passport": "^0.4.0",
-    "passport-jwt": "^4.0.0",
+    "passport-jwt-cookiecombo": "^1.0.5",
     "path": "^0.12.7",
     "pg": "^7.8.0",
     "serve-favicon": "^2.5.0"
