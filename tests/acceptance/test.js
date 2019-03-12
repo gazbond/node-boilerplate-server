@@ -9,5 +9,4 @@ Scenario("test user login route is present", I => {
 
 Scenario("test user api route is present", I => {
   I.sendGetRequest("/users");
-  I.saveScreenshot("screenshot.png");
 });
