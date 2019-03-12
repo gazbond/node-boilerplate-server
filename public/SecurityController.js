@@ -1,34 +1,52 @@
 const express = require("express");
-const { check, validationResult } = require("express-validator/check");
+const {
+  buildCheckFunction,
+  validationResult
+} = require("express-validator/check");
+const check = buildCheckFunction(["body", "query"]);
 
 const jwt = require("jsonwebtoken");
 const passport = require("../passport");
+
+const BassController = require("../lib/BaseController");
 const User = require("../models/User");
 
-module.exports = class SecurityController {
+// TODO: redirectUrl query param (no json response?)
+module.exports = class SecurityController extends BassController {
   constructor() {
+    super();
     // Options:
     this.loginRoute = "/security/login";
     this.registerRoute = "/security/register";
     // Validation:
     this.loginValidation = [
-      check("login").exists({
-        checkNull: true,
-        checkFalsy: true
-      }),
-      check("login").isAlphanumeric(),
-      check("login").isLength({ min: 3, max: 25 }),
-      check("password").exists({
-        checkNull: true,
-        checkFalsy: true
-      }),
-      check("password").isAlphanumeric(),
-      check("password").isLength({ min: 4 })
+      check(
+        "login",
+        "Login should be alpha-numeric and more than 3 characters long"
+      )
+        .exists({
+          checkNull: true,
+          checkFalsy: true
+        })
+        .isAlphanumeric()
+        .isLength({ min: 3 }),
+      check(
+        "password",
+        "Password should be alpha-numeric and more than 4 characters long"
+      )
+        .exists({
+          checkNull: true,
+          checkFalsy: true
+        })
+        .isAlphanumeric()
+        .isLength({ min: 4 })
     ];
     // To get 'this' in instance methods:
     this.initRoutes = this.initRoutes.bind(this);
+    this.loginViewParams = this.loginViewParams.bind(this);
     this.loginGet = this.loginGet.bind(this);
     this.loginPost = this.loginPost.bind(this);
+    this.registerViewParams = this.registerViewParams.bind(this);
     this.register = this.register.bind(this);
   }
   initRoutes(router) {
@@ -40,22 +58,26 @@ module.exports = class SecurityController {
     newRouter.post(this.registerRoute, this.register);
     router.use(newRouter);
   }
-  // Util:
-  renderParams(req, errors) {
+  // Utils: construct params passed to views/login.ejs
+  loginViewParams(req, errors) {
     return {
       errors: errors,
-      login: req.body.login ? req.body.login : "",
-      password: req.body.password ? req.body.password : ""
+      fields: ["login", "password"],
+      login: this.getParam(req, "login"),
+      password: this.getParam(req, "password")
     };
   }
+  // GET security/login
   async loginGet(req, res) {
-    return res.render("login", this.renderParams(req, []));
+    return res.render("login", this.loginViewParams(req, []));
   }
+  // POST security/login
   async loginPost(req, res) {
     // Check validation errors
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
-      return res.render("login", this.renderParams(req, errors.array()));
+      // mapped() means only 1 error per field. Specify fields[] for partials/errors.ejs
+      return res.render("login", this.loginViewParams(req, errors.mapped()));
     }
     // Try loading user
     // @ts-ignore
@@ -67,7 +89,9 @@ module.exports = class SecurityController {
     if (!user) {
       return res.render(
         "login",
-        this.renderParams(req, [{ param: "password", msg: "Incorrect login" }])
+        this.loginViewParams(req, {
+          login: { msg: "Incorrect login" }
+        })
       );
     }
     // Incorrect password
@@ -75,9 +99,9 @@ module.exports = class SecurityController {
     if (!validPassword) {
       return res.render(
         "login",
-        this.renderParams(req, [
-          { param: "password", msg: "Incorrect password" }
-        ])
+        this.loginViewParams(req, {
+          password: { msg: "Incorrect password" }
+        })
       );
     }
     // Generate token
@@ -100,12 +124,17 @@ module.exports = class SecurityController {
         });
         // Send Token
         return res.json({
-          Authorization: token,
-          issued: new Date().toISOString(),
-          duration: passport.EXPIRES
+          Authorization: token
         });
       }
     );
+  }
+  // Utils: construct params passed to views/register.ejs
+  registerViewParams(req, errors) {
+    return {
+      errors: errors,
+      fields: []
+    };
   }
   async register(req, res) {
     return res.status(501).end();
