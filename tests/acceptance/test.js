@@ -3,8 +3,8 @@
 Feature("Initial tests");
 
 Scenario("test user login route is present", I => {
-  I.amOnPage("/user/login");
-  I.see("Nothing here yet :(");
+  I.amOnPage("/security/login");
+  I.see("Login");
 });
 
 Scenario("test user api route is present", I => {

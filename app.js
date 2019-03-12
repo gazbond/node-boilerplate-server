@@ -50,10 +50,9 @@ userEndpoint.initRoutes(routerApi);
  * Create Express server.
  */
 const app = express();
-app.set("views", "./public/views");
 app.set("view engine", "ejs");
 app.use(favicon("public/favicon.ico"));
 app.use("/", routerPublic);
 app.use("/api/", routerApi);
-const PORT = 80;
+const PORT = 8080;
 app.listen(PORT, () => console.log(`Node app listening on port ${PORT}`));

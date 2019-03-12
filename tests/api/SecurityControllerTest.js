@@ -18,7 +18,9 @@ after(async function() {
 
 describe("Testing SecurityController", function() {
   it("test...", async function() {
-    const response = await chai.request("http://node").get("/security/login");
+    const response = await chai
+      .request("http://node:8080")
+      .get("/security/login");
     console.log("response: ", response.status);
   });
 });

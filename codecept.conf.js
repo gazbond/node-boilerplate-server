@@ -4,12 +4,12 @@ exports.config = {
   helpers: {
     WebDriver: {
       host: "chrome",
-      url: "http://node",
+      url: "http://node:8080",
       keepCookies: true,
       browser: "chrome"
     },
     REST: {
-      endpoint: "http://node/api",
+      endpoint: "http://node:8080/api",
       defaultHeaders: []
     }
   },

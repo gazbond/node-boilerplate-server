@@ -1,4 +1,6 @@
 exports.seed = async function(knex) {
+  const { Model } = require("objection");
+  Model.knex(knex);
   const User = require("../models/User");
   await knex("user_identity").del();
   // @ts-ignore

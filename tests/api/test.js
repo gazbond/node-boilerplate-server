@@ -17,9 +17,9 @@ after(async function() {
 });
 
 describe("Initial api tests", function() {
-  it("tests user api endpoint loads data", async function() {
-    const response = await chai.request("http://node").get("/api/users");
-    expect(response.body).to.be.an(Array);
-    expect(response.body).length(2);
+  it("tests user api endpoint fails without authentication", async function() {
+    const response = await chai.request("http://node:8080").get("/api/users");
+    expect(response.status).to.be(401);
+    expect(response.body).not.be.an(Array);
   });
 });
