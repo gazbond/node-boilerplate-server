@@ -82,23 +82,30 @@ module.exports = class SecurityController {
     }
     // Generate token
     const payload = { id: user.id };
-    const token = await jwt.sign(payload, passport.SECRET_OR_KEY, {
-      expiresIn: passport.EXPIRES
-    });
-    // Send Authorization header
-    res.header("Authorization", token);
-    // Send Set-Cookie header
-    res.cookie("Authorization", token, {
-      httpOnly: true,
-      sameSite: true
-    });
-
-    // Send Token
-    return res.json({
-      Authorization: token,
-      issued_at: new Date().toISOString,
-      expires_at: passport.EXPIRES
-    });
+    jwt.sign(
+      payload,
+      passport.SECRET_OR_KEY,
+      {
+        expiresIn: passport.EXPIRES
+      },
+      // Callback
+      (err, token) => {
+        if (err) throw err;
+        // Send Authorization header
+        res.header("Authorization", token);
+        // Send Set-Cookie header
+        res.cookie("Authorization", token, {
+          httpOnly: true,
+          sameSite: true
+        });
+        // Send Token
+        return res.json({
+          Authorization: token,
+          issued: new Date().toISOString(),
+          duration: passport.EXPIRES
+        });
+      }
+    );
   }
   async register(req, res) {
     return res.status(501).end();
