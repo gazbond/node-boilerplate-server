@@ -2,7 +2,7 @@ const express = require("express");
 const { check, validationResult } = require("express-validator/check");
 
 const User = require("../models/User");
-const BaseEndpoint = require("./BaseEndpoint");
+const BaseEndpoint = require("../lib/BaseEndpoint");
 
 module.exports = class UserEndpoint extends BaseEndpoint {
   constructor() {
