@@ -1,5 +1,5 @@
 const crypto = require("crypto-promise");
-const BaseModel = require("./BaseModel");
+const BaseModel = require("../lib/BaseModel");
 const Password = require("objection-password")({
   passwordField: "password_hash"
 });
