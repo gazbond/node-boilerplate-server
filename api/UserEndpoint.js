@@ -1,5 +1,9 @@
 const express = require("express");
-const { check, validationResult } = require("express-validator/check");
+const {
+  buildCheckFunction,
+  validationResult
+} = require("express-validator/check");
+const check = buildCheckFunction(["body", "query"]);
 
 const User = require("../models/User");
 const BaseEndpoint = require("../lib/BaseEndpoint");
