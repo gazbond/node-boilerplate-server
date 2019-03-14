@@ -1,25 +1,30 @@
-const express = require("express");
+const jwt = require("jsonwebtoken");
 const {
   buildCheckFunction,
   validationResult
 } = require("express-validator/check");
 const check = buildCheckFunction(["body", "query"]);
 
-const jwt = require("jsonwebtoken");
-const passport = require("../passport");
-
 const BassController = require("../lib/BaseController");
 const User = require("../models/User");
+const passport = require("../lib/helpers/passport");
+const { wrapAsync, getParam } = require("../lib/helpers/utils");
 
-// TODO: redirectUrl query param (no json response?)
+/**
+ * Security controller handles login, confirm email, change password.
+ * TODO: redirectUrl query param (no json response?)
+ */
 module.exports = class SecurityController extends BassController {
+  /**
+   * Configuration.
+   */
   constructor() {
     super();
     // Options:
     this.loginRoute = "/security/login";
     this.registerRoute = "/security/register";
-    // Validation:
-    this.loginValidation = [
+    // Route handlers:
+    this.handlers = [
       check(
         "login",
         "Login should be alpha-numeric and more than 3 characters long"
@@ -42,41 +47,43 @@ module.exports = class SecurityController extends BassController {
         .isLength({ min: 4 })
     ];
     // To get 'this' in instance methods:
-    this.initRoutes = this.initRoutes.bind(this);
-    this.loginViewParams = this.loginViewParams.bind(this);
     this.loginGet = this.loginGet.bind(this);
     this.loginPost = this.loginPost.bind(this);
-    this.registerViewParams = this.registerViewParams.bind(this);
-    this.register = this.register.bind(this);
   }
-  initRoutes(router) {
-    const newRouter = express.Router();
+  /**
+   * Returns express.Router() configured with routes/middleware.
+   */
+  initRoutes() {
     // Routes:
-    newRouter.get(this.loginRoute, this.loginGet);
-    newRouter.post(this.loginRoute, this.loginValidation, this.loginPost);
-    newRouter.get(this.registerRoute, this.register);
-    newRouter.post(this.registerRoute, this.register);
-    router.use(newRouter);
+    this.router.get(this.loginRoute, wrapAsync(this.loginGet));
+    this.router.post(this.loginRoute, this.handlers, wrapAsync(this.loginPost));
+    return this.router;
   }
-  // Utils: construct params passed to views/login.ejs
+  /**
+   * Utils: construct params passed to views/login.ejs
+   */
   loginViewParams(req, errors) {
     return {
       errors: errors,
       fields: ["login", "password"],
-      login: this.getParam(req, "login"),
-      password: this.getParam(req, "password")
+      login: getParam(req, "login"),
+      password: getParam(req, "password")
     };
   }
-  // GET security/login
+  /**
+   * GET security/login
+   */
   async loginGet(req, res) {
-    return res.render("login", this.loginViewParams(req, []));
+    res.render("login", this.loginViewParams(req, []));
   }
-  // POST security/login
+  /**
+   * POST security/login
+   */
   async loginPost(req, res) {
     // Check validation errors
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
-      // mapped() means only 1 error per field. Specify fields[] for partials/errors.ejs
+      // mapped() means only 1 error per field. Specify fields[] in partials/errors.ejs
       return res.render("login", this.loginViewParams(req, errors.mapped()));
     }
     // Try loading user
@@ -108,9 +115,9 @@ module.exports = class SecurityController extends BassController {
     const payload = { id: user.id };
     jwt.sign(
       payload,
-      passport.SECRET_OR_KEY,
+      passport.jwt.secretOrKey,
       {
-        expiresIn: passport.EXPIRES
+        expiresIn: passport.jwt.expiresIn
       },
       // Callback
       (err, token) => {
@@ -123,20 +130,19 @@ module.exports = class SecurityController extends BassController {
           sameSite: true
         });
         // Send Token
-        return res.json({
+        res.json({
           Authorization: token
         });
       }
     );
   }
-  // Utils: construct params passed to views/register.ejs
+  /**
+   * Utils: construct params passed to views/register.ejs
+   */
   registerViewParams(req, errors) {
     return {
       errors: errors,
       fields: []
     };
-  }
-  async register(req, res) {
-    return res.status(501).end();
   }
 };

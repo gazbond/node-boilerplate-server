@@ -1,0 +1,9 @@
+<%# Requires: error {} %>
+<div class="row mt-5">
+    <div class="col-md-12">
+        <div class="alert alert-danger">
+            <%= error.name %>: <%= error.message %>
+        </div>
+        <pre><%= error.stack %></pre>
+    </div>
+</div>

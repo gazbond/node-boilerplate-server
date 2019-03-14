@@ -1,6 +1,6 @@
 <%# Requires: errors {} and fields [] %>
 <%# Renders: validationResult() errors.mapped() using fields e.g. errors[field].msg %>
-<% fields.forEach(function(field) { %>
+<% fields.forEach(field => { %>
     <% if (errors[field]) { %>
         <div class="alert alert-danger alert-dismissible fade show" role="alert">
         <%= errors[field].msg %>
