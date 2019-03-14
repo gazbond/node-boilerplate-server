@@ -1,10 +1,16 @@
 exports.seed = async function(knex) {
   const { Model } = require("objection");
   Model.knex(knex);
-  const User = require("../models/User");
+
+  await knex("rbac_role_assignment").del();
+  await knex("rbac_permission_assignment").del();
+  await knex("rbac_permission").del();
+  await knex("rbac_role").del();
   await knex("user_identity").del();
+
+  const User = require("../models/User");
   // @ts-ignore
-  await User.query().insert({
+  const rootUser = await User.query().insert({
     username: "root",
     email: "dev@gazbond.co.uk",
     password_hash: "password"
@@ -15,4 +21,37 @@ exports.seed = async function(knex) {
     email: "gaz@gazbond.co.uk",
     password_hash: "password"
   });
+  const Role = require("../models/rbac/Role");
+  // @ts-ignore
+  const role = await Role.query()
+    .insert({
+      name: "admin"
+    })
+    .returning("*");
+
+  const Permission = require("../models/rbac/Permission");
+  // @ts-ignore
+  const permission = await Permission.query()
+    .insert({
+      name: "access-api"
+    })
+    .returning("*");
+
+  const PermissionAssignment = require("../models/rbac/PermissionAssignment");
+  // @ts-ignore
+  const permissionAssignment = await PermissionAssignment.query()
+    .insert({
+      permission_name: permission.name,
+      role_name: role.name
+    })
+    .returning("*");
+
+  const RoleAssignment = require("../models/rbac/RoleAssignment");
+  // @ts-ignore
+  const roleAssignment = await RoleAssignment.query()
+    .insert({
+      role_name: role.name,
+      user_id: rootUser.id
+    })
+    .returning("*");
 };

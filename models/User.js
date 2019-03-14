@@ -1,8 +1,10 @@
 const crypto = require("crypto-promise");
+const { Model } = require("objection");
 const BaseModel = require("../lib/BaseModel");
 const Password = require("objection-password")({
   passwordField: "password_hash"
 });
+const Role = require("./rbac/Role");
 
 module.exports = class User extends Password(BaseModel) {
   static get tableName() {
@@ -27,6 +29,23 @@ module.exports = class User extends Password(BaseModel) {
   static get visible() {
     return ["id", "username", "email", "auth_key", "created_at", "updated_at"];
   }
+  static get relationMappings() {
+    return {
+      roles: {
+        relation: Model.ManyToManyRelation,
+        modelClass: Role,
+        join: {
+          from: "user_identity.id",
+          through: {
+            from: "rbac_role_assignment.user_id",
+            to: "rbac_role_assignment.role_name"
+          },
+          to: "rbac_role.name"
+        }
+      }
+    };
+  }
+  static assignRole() {}
   $beforeInsert(queryContext) {
     const maybePromise = super.$beforeInsert(queryContext);
     return Promise.resolve(maybePromise).then(async () => {
