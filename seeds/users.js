@@ -16,27 +16,41 @@ exports.seed = async function(knex) {
     password_hash: "password"
   });
   // @ts-ignore
-  await User.query().insert({
+  const gazbondUser = await User.query().insert({
     username: "gazbond",
     email: "gaz@gazbond.co.uk",
     password_hash: "password"
   });
   const Role = require("../models/rbac/Role");
   // @ts-ignore
-  const role = await Role.query()
+  const adminRole = await Role.query()
     .insert({
       name: "admin"
     })
     .returning("*");
 
-  const Permission = require("../models/rbac/Permission");
-  // @ts-ignore
-  const permission = await Permission.query()
+  const userRole = await Role.query()
     .insert({
-      name: "can-access-api"
+      name: "user"
     })
     .returning("*");
 
-  await role.$assignPermission(permission);
-  await rootUser.$assignRole(role);
+  const Permission = require("../models/rbac/Permission");
+  // @ts-ignore
+  const writePerm = await Permission.query()
+    .insert({
+      name: "can-write-api"
+    })
+    .returning("*");
+
+  const readPerm = await Permission.query()
+    .insert({
+      name: "can-read-api"
+    })
+    .returning("*");
+
+  await adminRole.assignPermissions([writePerm, readPerm]);
+  await userRole.assignPermission(readPerm);
+  await rootUser.assignRoles([adminRole, userRole]);
+  await gazbondUser.assignRole(userRole);
 };

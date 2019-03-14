@@ -49,11 +49,24 @@ module.exports = class User extends Password(BaseModel) {
   /**
    * @param {Role} role
    */
-  async $assignRole(role) {
+  async assignRole(role) {
     await RoleAssignment.query().insert({
       role_name: role.name,
       user_id: this.id
     });
+  }
+  /**
+   * @param {Role[]} roles
+   */
+  async assignRoles(roles) {
+    const inserts = [];
+    roles.forEach(role => {
+      inserts.push({
+        role_name: role.name,
+        user_id: this.id
+      });
+    });
+    await RoleAssignment.query().insert(inserts);
   }
   $beforeInsert(queryContext) {
     const maybePromise = super.$beforeInsert(queryContext);
