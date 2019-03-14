@@ -33,25 +33,10 @@ exports.seed = async function(knex) {
   // @ts-ignore
   const permission = await Permission.query()
     .insert({
-      name: "access-api"
+      name: "can-access-api"
     })
     .returning("*");
 
-  const PermissionAssignment = require("../models/rbac/PermissionAssignment");
-  // @ts-ignore
-  const permissionAssignment = await PermissionAssignment.query()
-    .insert({
-      permission_name: permission.name,
-      role_name: role.name
-    })
-    .returning("*");
-
-  const RoleAssignment = require("../models/rbac/RoleAssignment");
-  // @ts-ignore
-  const roleAssignment = await RoleAssignment.query()
-    .insert({
-      role_name: role.name,
-      user_id: rootUser.id
-    })
-    .returning("*");
+  await role.$assignPermission(permission);
+  await rootUser.$assignRole(role);
 };

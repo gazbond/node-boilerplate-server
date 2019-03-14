@@ -5,6 +5,7 @@ const Password = require("objection-password")({
   passwordField: "password_hash"
 });
 const Role = require("./rbac/Role");
+const RoleAssignment = require("./rbac/RoleAssignment");
 
 module.exports = class User extends Password(BaseModel) {
   static get tableName() {
@@ -45,7 +46,15 @@ module.exports = class User extends Password(BaseModel) {
       }
     };
   }
-  static assignRole() {}
+  /**
+   * @param {Role} role
+   */
+  async $assignRole(role) {
+    await RoleAssignment.query().insert({
+      role_name: role.name,
+      user_id: this.id
+    });
+  }
   $beforeInsert(queryContext) {
     const maybePromise = super.$beforeInsert(queryContext);
     return Promise.resolve(maybePromise).then(async () => {

@@ -3,6 +3,7 @@ const { DbErrors } = require("objection-db-errors");
 const BaseClass = DbErrors(Model);
 
 const Permission = require("./Permission");
+const PermissionAssignment = require("./PermissionAssignment");
 
 module.exports = class Role extends BaseClass {
   static get tableName() {
@@ -36,5 +37,13 @@ module.exports = class Role extends BaseClass {
       }
     };
   }
-  static assignPermission() {}
+  /**
+   * @param {Permission} permission
+   */
+  async $assignPermission(permission) {
+    await PermissionAssignment.query().insert({
+      permission_name: permission.name,
+      role_name: this.name
+    });
+  }
 };
