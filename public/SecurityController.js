@@ -22,7 +22,6 @@ module.exports = class SecurityController extends BassController {
     super();
     // Options:
     this.loginRoute = "/security/login";
-    this.registerRoute = "/security/register";
     // Route handlers:
     this.handlers = [
       check(
@@ -74,7 +73,7 @@ module.exports = class SecurityController extends BassController {
    * GET security/login
    */
   async loginGet(req, res) {
-    res.render("login", this.loginViewParams(req, []));
+    res.render("security/login", this.loginViewParams(req, []));
   }
   /**
    * POST security/login
@@ -84,7 +83,10 @@ module.exports = class SecurityController extends BassController {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
       // mapped() means only 1 error per field. Specify fields[] in partials/errors.ejs
-      return res.render("login", this.loginViewParams(req, errors.mapped()));
+      return res.render(
+        "security/login",
+        this.loginViewParams(req, errors.mapped())
+      );
     }
     // Try loading user
     // @ts-ignore
@@ -95,7 +97,7 @@ module.exports = class SecurityController extends BassController {
     // User not found
     if (!user) {
       return res.render(
-        "login",
+        "security/login",
         this.loginViewParams(req, {
           login: { msg: "Incorrect login" }
         })
@@ -105,7 +107,7 @@ module.exports = class SecurityController extends BassController {
     const validPassword = await user.verifyPassword(req.body.password);
     if (!validPassword) {
       return res.render(
-        "login",
+        "security/login",
         this.loginViewParams(req, {
           password: { msg: "Incorrect password" }
         })
@@ -135,14 +137,5 @@ module.exports = class SecurityController extends BassController {
         });
       }
     );
-  }
-  /**
-   * Utils: construct params passed to views/register.ejs
-   */
-  registerViewParams(req, errors) {
-    return {
-      errors: errors,
-      fields: []
-    };
   }
 };
