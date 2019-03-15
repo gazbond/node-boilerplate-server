@@ -22,7 +22,7 @@ module.exports = class UserEndpoint extends BaseEndpoint {
     this.route = "/users";
     this.routeWithId = "/users/:id";
     // Route handlers:
-    this.handlers = [passport.jwt.auth, rbac.init, rbac.auth.isInRole("admin")];
+    this.handlers = [passport.auth, rbac.auth, rbac.isInRole("admin")];
   }
   /**
    * Uses json param 'q'
