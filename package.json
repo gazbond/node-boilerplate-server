@@ -1,7 +1,9 @@
 {
   "name": "node-boilerplate-app",
   "version": "1.0.0",
-  "description": "node boilerplate app with user management using postgresql",
+  "description": "node boilerplate app",
+  "author": "gazbond.co.uk",
+  "license": "MIT",
   "scripts": {
     "lint-fix": "eslint --fix --ignore-pattern \"node_modules/**/*.js\" \"**/*.js\"",
     "test-lint": "eslint --format codeframe --ignore-pattern \"node_modules/**/*.js\" \"**/*.js\"",
@@ -13,8 +15,6 @@
     "start-debug": "nodemon --inspect=0.0.0.0 app.js",
     "start-docker": "npm install --quiet && npm run start-debug"
   },
-  "author": "gazbond.co.uk",
-  "license": "MIT",
   "dependencies": {
     "bcrypt": "^3.0.4",
     "body-parser": "^1.18.3",
