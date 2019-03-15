@@ -20,7 +20,7 @@ services:
         environment:
             POSTGRES_PASSWORD: postgres
         volumes:
-            - ./lib/docker/init.sql:/docker-entrypoint-initdb.d/init.sql:delegated
+            - ./library/docker/init.sql:/docker-entrypoint-initdb.d/init.sql:delegated
         ports:
             - 5432:5432
     chrome:

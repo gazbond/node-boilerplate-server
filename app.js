@@ -39,7 +39,7 @@ routerPublic.use(
 /**
  * Public home page and favicon.
  */
-routerPublic.use(favicon("lib/static/favicon.ico"));
+routerPublic.use(favicon("library/static/favicon.ico"));
 routerPublic.get("/", (req, res) => {
   res.render("home");
 });

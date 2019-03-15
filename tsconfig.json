@@ -4,6 +4,6 @@
     "target": "ES6",
     "sourceMap": true
   },
-  "include": ["lib/typings/*.d.ts"],
+  "include": ["library/typings/*.d.ts"],
   "exclude": ["node_modules", "**/node_modules/*"]
 }

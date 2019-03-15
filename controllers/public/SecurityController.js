@@ -5,10 +5,10 @@ const {
 } = require("express-validator/check");
 const check = buildCheckFunction(["body", "query"]);
 
-const BassController = require("../../lib/BaseController");
+const BassController = require("../../library/BaseController");
 const User = require("../../models/User");
-const passport = require("../../lib/helpers/passport");
-const { wrapAsync, getParam } = require("../../lib/helpers/utils");
+const passport = require("../../library/helpers/passport");
+const { wrapAsync, getParam } = require("../../library/helpers/utils");
 
 /**
  * Security controller handles login, confirm email, change password.

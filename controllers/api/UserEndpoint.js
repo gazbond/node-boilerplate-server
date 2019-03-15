@@ -4,10 +4,10 @@ const {
 } = require("express-validator/check");
 const check = buildCheckFunction(["body", "query"]);
 
-const BaseEndpoint = require("../../lib/BaseEndpoint");
+const BaseEndpoint = require("../../library/BaseEndpoint");
 const User = require("../../models/User");
-const passport = require("../../lib/helpers/passport");
-const rbac = require("../../lib/helpers/rbac");
+const passport = require("../../library/helpers/passport");
+const rbac = require("../../library/helpers/rbac");
 
 /**
  * User endpoint exposes User model over http.
