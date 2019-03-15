@@ -1,4 +1,4 @@
-/// <reference path="../../typings/steps.d.ts" />
+/// <reference path="../../lib/typings/steps.d.ts" />
 
 Feature("Test SecurityController");
 

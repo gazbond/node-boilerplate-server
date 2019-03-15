@@ -1,10 +1,9 @@
 const expect = require("expect.js");
 const chai = require("chai");
 const chaiHttp = require("chai-http");
-const should = chai.should();
 chai.use(chaiHttp);
 
-const objection = require("objection");
+const { ValidationError } = require("objection");
 const knex = require("../knex");
 const User = require("../../models/User");
 
@@ -18,8 +17,8 @@ after(async function() {
   await knex.destroy();
 });
 
-describe("Initial tests", function() {
-  it("tests User.username=root loads from database", async function() {
+describe("Test User model", function() {
+  it("tests User username=root loads", async function() {
     // @ts-ignore
     const user = await User.query()
       .where({
@@ -36,7 +35,7 @@ describe("Initial tests", function() {
         email: "not-an-email"
       });
     } catch (error) {
-      if (error instanceof objection.ValidationError) {
+      if (error instanceof ValidationError) {
         expect(error.data).to.have.property("username");
         expect(error.data.username).to.eql([
           {
@@ -58,7 +57,7 @@ describe("Initial tests", function() {
       }
     }
   });
-  it("tests User creates timestamps and hashes password on insert and update", async function() {
+  it("tests User creates timestamps and hashes on insert and update", async function() {
     // Test insert
     // @ts-ignore
     const insertUser = await User.query()
@@ -70,17 +69,19 @@ describe("Initial tests", function() {
       // Postgres 'trick' to fetch inserted row
       .returning("*");
     expect(insertUser.password_hash).to.be.a("string");
+    expect(insertUser.password_hash).to.not.eql("password");
+    expect(insertUser.auth_key).to.be.a("string");
     expect(insertUser.created_at).to.be.a(Date);
     expect(insertUser.updated_at).to.be.a(Date);
     // Test update (patch)
-    const password_hash = insertUser.password_hash;
-    const updated_at = insertUser.updated_at;
     // @ts-ignore
     const updateUser = await User.query().patchAndFetchById(insertUser.id, {
       username: "gazb"
     });
-    expect(insertUser.password_hash).to.equal(password_hash);
-    expect(insertUser.updated_at).to.be.a(Date);
-    expect(updateUser.updated_at).to.not.equal(new Date(updated_at));
+    expect(updateUser.password_hash).to.eql(insertUser.password_hash);
+    expect(updateUser.auth_key).to.eql(insertUser.auth_key);
+    expect(updateUser.updated_at).to.be.a(Date);
+    expect(updateUser.created_at).to.eql(insertUser.created_at);
+    expect(updateUser.updated_at).to.not.eql(insertUser.updated_at);
   });
 });
