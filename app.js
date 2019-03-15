@@ -46,7 +46,7 @@ routerPublic.get("/", (req, res) => {
 /**
  * Public security controller.
  */
-const SecurityController = require("./public/SecurityController");
+const SecurityController = require("./controllers/public/SecurityController");
 const securityController = new SecurityController();
 routerPublic.use(securityController.initRoutes());
 /**
@@ -73,7 +73,7 @@ routerApi.use(
 /**
  * API user endpoint.
  */
-const UserEndpoint = require("./api/UserEndpoint");
+const UserEndpoint = require("./controllers/api/UserEndpoint");
 const userEndpoint = new UserEndpoint();
 routerApi.use(userEndpoint.initRoutes());
 /**
