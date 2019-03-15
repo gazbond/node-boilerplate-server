@@ -22,8 +22,7 @@ module.exports = class User extends Password(BaseModel) {
         id: { type: "integer" },
         username: { type: "string", minLength: 1, maxLength: 25 },
         email: { type: "string", format: "email" },
-        password_hash: { type: "string", minLength: 0, maxLength: 60 },
-        auth_key: { type: "string", minLength: 0, maxLength: 32 }
+        password_hash: { type: "string", minLength: 0, maxLength: 60 }
       }
     };
   }
@@ -47,6 +46,12 @@ module.exports = class User extends Password(BaseModel) {
     };
   }
   /**
+   * Make intellisense work after objection-password breaks it.
+   */
+  static query() {
+    return super.query();
+  }
+  /**
    * @param {Role} role
    */
   async assignRole(role) {
@@ -68,6 +73,9 @@ module.exports = class User extends Password(BaseModel) {
     });
     await RoleAssignment.query().insert(inserts);
   }
+  /**
+   * Generate auth key.
+   */
   $beforeInsert(queryContext) {
     const maybePromise = super.$beforeInsert(queryContext);
     return Promise.resolve(maybePromise).then(async () => {

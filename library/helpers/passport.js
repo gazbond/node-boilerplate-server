@@ -18,7 +18,6 @@ const strategy = new JwtStrategy(
   async (payload, done) => {
     // Try loading User
     try {
-      // @ts-ignore
       const user = await User.query()
         .eager("roles.permissions")
         .findById(payload.id);

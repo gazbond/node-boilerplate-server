@@ -19,7 +19,6 @@ after(async function() {
 
 describe("Test User model", function() {
   it("tests User username=root loads", async function() {
-    // @ts-ignore
     const user = await User.query()
       .where({
         username: "root"
@@ -29,7 +28,6 @@ describe("Test User model", function() {
   });
   it("tests User fails validation", async function() {
     try {
-      // @ts-ignore
       const user = await User.query().insert({
         username: "",
         email: "not-an-email"
@@ -59,7 +57,6 @@ describe("Test User model", function() {
   });
   it("tests User creates timestamps and hashes on insert and update", async function() {
     // Test insert
-    // @ts-ignore
     const insertUser = await User.query()
       .insert({
         username: "gaz",
@@ -74,7 +71,6 @@ describe("Test User model", function() {
     expect(insertUser.created_at).to.be.a(Date);
     expect(insertUser.updated_at).to.be.a(Date);
     // Test update (patch)
-    // @ts-ignore
     const updateUser = await User.query().patchAndFetchById(insertUser.id, {
       username: "gazb"
     });

@@ -11,7 +11,7 @@ const passport = require("../../library/helpers/passport");
 const { wrapAsync, getParam } = require("../../library/helpers/utils");
 
 /**
- * Security controller handles login, confirm email, change password.
+ * Security controller handles login, register, confirm email and change password.
  * TODO: redirectUrl query param (no json response?)
  */
 module.exports = class SecurityController extends BassController {
@@ -89,7 +89,6 @@ module.exports = class SecurityController extends BassController {
       );
     }
     // Try loading user
-    // @ts-ignore
     const user = await User.query()
       .where({ username: req.body.login })
       .orWhere({ email: req.body.login })
