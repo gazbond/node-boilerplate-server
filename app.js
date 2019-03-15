@@ -9,11 +9,16 @@ const logger = require("morgan");
 const favicon = require("serve-favicon");
 
 /**
+ * Config.
+ */
+const config = require("./app.conf");
+
+/**
  * Knex database with Objection models (db).
  */
 const environment = process.env.ENVIRONMENT || "development";
-const config = require("./knexfile")[environment];
-const knex = require("knex")(config);
+const db = require("./knexfile")[environment];
+const knex = require("knex")(db);
 // Log SQL.
 knex.on("query", query => {
   console.log("[SQL]", query.sql);
@@ -100,4 +105,5 @@ app.set("view engine", "ejs");
 app.use("/", routerPublic);
 app.use("/api/", routerApi);
 const PORT = 8080;
-app.listen(PORT, () => console.log(`Node listening on ${PORT}`));
+const NAME = config.name;
+app.listen(PORT, () => console.log(`${NAME} listening on ${PORT}`));
