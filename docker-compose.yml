@@ -9,6 +9,8 @@ services:
             - ./:/app:delegated
         environment:
             - NODE_ENV=development
+            - TERM=xterm-256color
+        tty: true
         depends_on:
             - postgres
         ports: 
