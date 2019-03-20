@@ -18,6 +18,7 @@
   "dependencies": {
     "bcrypt": "^3.0.4",
     "body-parser": "^1.18.3",
+    "chalk": "^2.4.2",
     "crypto-promise": "^2.1.0",
     "ejs": "^2.6.1",
     "express": "^4.16.4",
@@ -33,12 +34,14 @@
     "objection": "^1.6.1",
     "objection-db-errors": "^1.0.0",
     "objection-password": "^2.0.0",
+    "objection-unique": "^1.0.1",
     "objection-visibility": "^0.4.0",
     "passport": "^0.4.0",
     "passport-jwt": "^4.0.0",
     "path": "^0.12.7",
     "pg": "^7.8.0",
-    "serve-favicon": "^2.5.0"
+    "serve-favicon": "^2.5.0",
+    "sql-formatter": "^2.3.2"
   },
   "devDependencies": {
     "@babel/core": "^7.3.3",

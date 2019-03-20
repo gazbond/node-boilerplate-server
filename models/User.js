@@ -4,10 +4,15 @@ const BaseModel = require("../library/BaseModel");
 const Password = require("objection-password")({
   passwordField: "password_hash"
 });
+const Unique = require("objection-unique")({
+  fields: ["email", "username"],
+  identifiers: ["id"]
+});
+const BaseClass = Password(Unique(BaseModel));
 const Role = require("./rbac/Role");
 const RoleAssignment = require("./rbac/RoleAssignment");
 
-module.exports = class User extends Password(BaseModel) {
+module.exports = class User extends BaseClass {
   static get tableName() {
     return "user_identity";
   }
@@ -61,6 +66,12 @@ module.exports = class User extends Password(BaseModel) {
     });
   }
   /**
+   * @param {Role} role
+   */
+  async removeRole(role) {
+    await RoleAssignment.query().deleteById([role.name, this.id]);
+  }
+  /**
    * @param {Role[]} roles
    */
   async assignRoles(roles) {
@@ -72,6 +83,14 @@ module.exports = class User extends Password(BaseModel) {
       });
     });
     await RoleAssignment.query().insert(inserts);
+  }
+  /**
+   * @param {Role[]} roles
+   */
+  async removeRoles(roles) {
+    roles.forEach(async role => {
+      await RoleAssignment.query().deleteById([role.name, this.id]);
+    });
   }
   /**
    * Generate auth key.

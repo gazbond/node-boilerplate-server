@@ -47,16 +47,33 @@ module.exports = class Role extends BaseClass {
     });
   }
   /**
+   * @param {Permission} permission
+   */
+  async removePermission(permission) {
+    await PermissionAssignment.query().deleteById([permission.name, this.name]);
+  }
+  /**
    * @param {Permission[]} permissions
    */
   async assignPermissions(permissions) {
     const inserts = [];
-    permissions.forEach(perm => {
+    permissions.forEach(permission => {
       inserts.push({
-        permission_name: perm.name,
+        permission_name: permission.name,
         role_name: this.name
       });
     });
     await PermissionAssignment.query().insert(inserts);
+  }
+  /**
+   * @param {Permission[]} permissions
+   */
+  async removePermissions(permissions) {
+    permissions.forEach(async permission => {
+      await PermissionAssignment.query().deleteById([
+        permission.name,
+        this.name
+      ]);
+    });
   }
 };
