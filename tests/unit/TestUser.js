@@ -6,6 +6,10 @@ chai.use(chaiHttp);
 const { ValidationError } = require("objection");
 const knex = require("../knex");
 const User = require("../../models/User");
+const Role = require("../../models/rbac/Role");
+const Permission = require("../../models/rbac/Permission");
+
+const { sleep } = require("../../library/helpers/utils");
 
 before(async function() {
   await knex.migrate.latest();
@@ -28,7 +32,7 @@ describe("Test User model", function() {
   });
   it("tests User fails validation", async function() {
     try {
-      const user = await User.query().insert({
+      await User.query().insertAndFetch({
         username: "",
         email: "not-an-email"
       });
@@ -57,27 +61,52 @@ describe("Test User model", function() {
   });
   it("tests User creates timestamps and hashes on insert and update", async function() {
     // Test insert
-    const insertUser = await User.query()
-      .insert({
-        username: "gaz",
-        email: "test@gazbond.co.uk",
-        password_hash: "password"
-      })
-      // Postgres 'trick' to fetch inserted row
-      .returning("*");
-    expect(insertUser.password_hash).to.be.a("string");
-    expect(insertUser.password_hash).to.not.eql("password");
-    expect(insertUser.auth_key).to.be.a("string");
-    expect(insertUser.created_at).to.be.a(Date);
-    expect(insertUser.updated_at).to.be.a(Date);
+    const user = await User.query().insertAndFetch({
+      username: "gaz",
+      email: "test@gazbond.co.uk",
+      password_hash: "password"
+    });
+    expect(user.password_hash).to.be.a("string");
+    expect(user.password_hash).to.not.eql("password");
+    expect(user.auth_key).to.be.a("string");
+    expect(user.created_at).to.be.a(Date);
+    expect(user.updated_at).to.be.a(Date);
+    const created_at = user.created_at;
+    const updated_at = user.updated_at;
+    const password_hash = user.password_hash;
+    const auth_key = user.auth_key;
     // Test update (patch)
-    const updateUser = await User.query().patchAndFetchById(insertUser.id, {
+    await user.$query().patchAndFetch({
       username: "gazb"
     });
-    expect(updateUser.password_hash).to.eql(insertUser.password_hash);
-    expect(updateUser.auth_key).to.eql(insertUser.auth_key);
-    expect(updateUser.updated_at).to.be.a(Date);
-    expect(updateUser.created_at).to.eql(insertUser.created_at);
-    expect(updateUser.updated_at).to.not.eql(insertUser.updated_at);
+    expect(user.password_hash).to.eql(password_hash);
+    expect(user.auth_key).to.eql(auth_key);
+    expect(user.updated_at).to.be.a(Date);
+    expect(user.created_at).to.eql(created_at);
+    expect(user.updated_at).to.not.eql(updated_at);
+  });
+  it("tests User removing roles and permissions", async function() {
+    // Load user
+    const user = await User.query()
+      .eager("roles")
+      .where({
+        username: "root"
+      })
+      .first();
+    expect(user.roles).to.have.length(2);
+    // Load role and permission
+    const role = await Role.query()
+      .eager("permissions")
+      .findById("admin");
+    expect(role.permissions).to.have.length(2);
+    const permission = await Permission.query().findById("can-read-api");
+    // Remove role/permission
+    user.removeRole(role);
+    role.removePermission(permission);
+    // Check removals worked
+    const roles = await user.$relatedQuery("roles");
+    expect(roles).to.have.length(1);
+    const permissions = await role.$relatedQuery("permissions");
+    expect(permissions).to.have.length(1);
   });
 });
