@@ -1,4 +1,5 @@
 const express = require("express");
+const { bindMethods } = require("./helpers/utils");
 
 /**
  * Bass class for public endpoints.
@@ -10,13 +11,17 @@ module.exports = class BassController {
   constructor() {
     // Router:
     this.router = express.Router();
-    // Route handlers (set this is subclass):
-    this.handlers = [];
+    // Paths:
+    this.paths = {};
+    // Validations (set this is subclass):
+    this.validators = {};
+    // Middleware (set this is subclass):
+    this.middleware = {};
     // To get 'this' in instance methods:
-    this.initRoutes = this.initRoutes.bind(this);
+    bindMethods(this, ["initRouter"]);
   }
   /**
-   * Abstract: return express.Router() configured with routes/middleware.
+   * Abstract: returns express.Router() configured with paths/middleware.
    */
-  initRoutes() {}
+  initRouter() {}
 };
