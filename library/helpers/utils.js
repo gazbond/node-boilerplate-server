@@ -80,19 +80,17 @@ const getField = (req, name, def = "") => {
 };
 
 /**
- * Extract params from req.body using model.fields if present
- * or model.jsonSchema.properties if not.
+ * Extract params from req.body using model.fields.
  *
  * @param {Request} req
  * @param {Object} model
  */
 const getFields = (req, model) => {
-  let fields = model.jsonSchema.properties;
-  if (model.hasOwnProperty("fields")) fields = model.fields;
+  const fields = model.fields;
   const idColumn = model.idColumn;
   // Build data
   const data = {};
-  Object.keys(fields).forEach(key => {
+  fields.forEach(key => {
     // Ignore id column
     if (key !== idColumn) {
       let param = getField(req, key, null);
