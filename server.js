@@ -1,5 +1,4 @@
 const chalk = require("chalk").default;
-const { Model } = require("objection");
 
 /**
  * ------------------------------------------------------
@@ -15,17 +14,12 @@ const config = require(configPath);
 
 /**
  * ------------------------------------------------------
- * Knex database with Objection models (db).
+ * Knex database logging
  * ------------------------------------------------------
  */
-const db = require("./knexfile")[environment];
-const knex = require("knex")(db);
-// Log SQL.
-knex.on("query", query => {
+config.knex.on("query", query => {
   console.log(chalk.green(query.sql));
 });
-// Provide connection to models.
-Model.knex(knex);
 
 /**
  * ------------------------------------------------------
