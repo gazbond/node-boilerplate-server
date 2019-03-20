@@ -4,7 +4,7 @@ const chaiHttp = require("chai-http");
 chai.use(chaiHttp);
 
 const { ValidationError } = require("objection");
-const knex = require("../knex");
+const knex = require("../../config/test.conf").knex;
 const User = require("../../models/User");
 const Role = require("../../models/rbac/Role");
 const Permission = require("../../models/rbac/Permission");
