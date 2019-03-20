@@ -1,9 +1,7 @@
 const crypto = require("crypto-promise");
 const { Model } = require("objection");
 const BaseModel = require("../library/BaseModel");
-const Password = require("objection-password")({
-  passwordField: "password_hash"
-});
+const Password = require("objection-password")();
 const Unique = require("objection-unique")({
   fields: ["email", "username"],
   identifiers: ["id"]
@@ -27,9 +25,12 @@ module.exports = class User extends BaseClass {
         id: { type: "integer" },
         username: { type: "string", minLength: 1, maxLength: 25 },
         email: { type: "string", format: "email" },
-        password_hash: { type: "string", minLength: 0, maxLength: 60 }
+        password: { type: "string", minLength: 0, maxLength: 60 }
       }
     };
+  }
+  static get fields() {
+    return ["username", "email", "password"];
   }
   static get visible() {
     return ["id", "username", "email", "auth_key", "created_at", "updated_at"];

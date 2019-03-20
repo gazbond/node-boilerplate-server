@@ -12,12 +12,12 @@ exports.seed = async function(knex) {
   const rootUser = await User.query().insert({
     username: "root",
     email: "dev@gazbond.co.uk",
-    password_hash: "password"
+    password: "password"
   });
   const gazbondUser = await User.query().insert({
     username: "gazbond",
     email: "gaz@gazbond.co.uk",
-    password_hash: "password"
+    password: "password"
   });
   const Role = require("../models/rbac/Role");
   const adminRole = await Role.query()

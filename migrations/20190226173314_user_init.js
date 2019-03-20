@@ -10,7 +10,7 @@ exports.up = async function(knex) {
       .notNullable();
     table.string("username", 25).notNullable();
     table.string("email", 255).notNullable();
-    table.string("password_hash", 60);
+    table.string("password", 60);
     table.string("auth_key", 32);
     table.timestamps();
   });

@@ -64,22 +64,22 @@ describe("Test User model", function() {
     const user = await User.query().insertAndFetch({
       username: "gaz",
       email: "test@gazbond.co.uk",
-      password_hash: "password"
+      password: "password"
     });
-    expect(user.password_hash).to.be.a("string");
-    expect(user.password_hash).to.not.eql("password");
+    expect(user.password).to.be.a("string");
+    expect(user.password).to.not.eql("password");
     expect(user.auth_key).to.be.a("string");
     expect(user.created_at).to.be.a(Date);
     expect(user.updated_at).to.be.a(Date);
     const created_at = user.created_at;
     const updated_at = user.updated_at;
-    const password_hash = user.password_hash;
+    const password = user.password;
     const auth_key = user.auth_key;
     // Test update (patch)
     await user.$query().patchAndFetch({
       username: "gazb"
     });
-    expect(user.password_hash).to.eql(password_hash);
+    expect(user.password).to.eql(password);
     expect(user.auth_key).to.eql(auth_key);
     expect(user.updated_at).to.be.a(Date);
     expect(user.created_at).to.eql(created_at);

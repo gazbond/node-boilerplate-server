@@ -20,6 +20,7 @@ before(async function() {
       password: "password"
     });
   token = login.body.Authorization;
+  console.log("token: ", token);
 });
 after(async function() {
   await knex.destroy();
@@ -52,12 +53,13 @@ describe("Test UserEndpoint", function() {
       .send({
         username: "gazb",
         email: "me@notu.com",
-        password_hash: "password"
+        password: "password"
       });
+    id = response.body.id;
+    console.log("id: ", id);
     expect(response.status).to.equal(200);
     expect(response.body.username).to.eql("gazb");
     expect(response.body.email).to.eql("me@notu.com");
-    id = response.body.id;
   });
   it("test UserEndpoint update action", async function() {
     const response = await chai
