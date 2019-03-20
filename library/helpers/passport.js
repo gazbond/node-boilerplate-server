@@ -4,7 +4,19 @@ const JwtStrategy = passportJwt.Strategy;
 const ExtractJwt = passportJwt.ExtractJwt;
 
 const User = require("../../models/User");
-const { secretOrKey, expiresIn } = require("../../app.conf").jwt;
+
+/**
+ * ------------------------------------------------------
+ * Config.
+ * ------------------------------------------------------
+ */
+const environment = process.env.ENVIRONMENT || "development";
+let configPath = "../../config/dev.conf";
+if (environment === "testing") {
+  configPath = "../../config/test.conf";
+}
+
+const { secretOrKey, expiresIn } = require(configPath).jwt;
 
 /**
  * Extract token from Authorization/Bearer header.

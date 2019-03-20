@@ -9,29 +9,7 @@ const logger = require("morgan");
 const chalk = require("chalk").default;
 const sqlFormatter = require("sql-formatter");
 const favicon = require("serve-favicon");
-const { Model, ValidationError } = require("objection");
-
-/**
- * ------------------------------------------------------
- * Config.
- * ------------------------------------------------------
- */
-const config = require("./app.conf");
-
-/**
- * ------------------------------------------------------
- * Knex database with Objection models (db).
- * ------------------------------------------------------
- */
-const environment = process.env.ENVIRONMENT || "development";
-const db = require("./knexfile")[environment];
-const knex = require("knex")(db);
-// Log SQL.
-knex.on("query", query => {
-  console.log(chalk.green(query.sql));
-});
-// Provide connection to models.
-Model.knex(knex);
+const { ValidationError } = require("objection");
 
 /**
  * ------------------------------------------------------
@@ -66,7 +44,7 @@ routerPublic.use(securityController.initRouter());
  * Public error handler.
  */
 routerPublic.use((err, req, res, next) => {
-  console.log("err: ", err);
+  // console.log("err: ", err);
   // HTTP
   if (err.statusCode) res.status(err.statusCode);
   else if (err.status) res.status(err.status);
@@ -98,7 +76,7 @@ routerApi.use(userEndpoint.initRouter());
  * API error handler.
  */
 routerApi.use((err, req, res, next) => {
-  console.log("err: ", err);
+  // console.log("err: ", err);
   // Validation
   if (err instanceof ValidationError) {
     return res.status(err.statusCode).json({
@@ -120,7 +98,7 @@ routerApi.use((err, req, res, next) => {
 
 /**
  * ------------------------------------------------------
- * Create Express server.
+ * Create Express app.
  * ------------------------------------------------------
  */
 const app = express();
@@ -144,7 +122,10 @@ app.set("view engine", "ejs");
 app.use("/", routerPublic);
 // API routes.
 app.use("/api/", routerApi);
-// Server.
-const PORT = 8080;
-const NAME = config.name;
-app.listen(PORT, () => console.log(`${NAME} listening on ${PORT}`));
+
+/**
+ * ------------------------------------------------------
+ * Export Express app.
+ * ------------------------------------------------------
+ */
+module.exports = app;
