@@ -1,9 +1,3 @@
-const {
-  buildCheckFunction,
-  validationResult
-} = require("express-validator/check");
-const check = buildCheckFunction(["body", "query"]);
-
 const BaseEndpoint = require("../../library/BaseEndpoint");
 const User = require("../../models/User");
 const passport = require("../../library/helpers/passport");
@@ -13,37 +7,25 @@ const rbac = require("../../library/helpers/rbac");
  * User endpoint exposes User model over http.
  */
 module.exports = class UserEndpoint extends BaseEndpoint {
-  /**
-   * Configuration.
-   */
   constructor() {
-    super(User);
-    // Options:
-    this.route = "/users";
-    this.routeWithId = "/users/:id";
-    // Route handlers:
-    this.handlers = [passport.auth, rbac.auth, rbac.isInRole("admin")];
+    super(User, "/users");
+    const readMiddleware = [
+      passport.auth,
+      rbac.auth,
+      rbac.hasPermission("can-read-api")
+    ];
+    const writeMiddleware = [
+      passport.auth,
+      rbac.auth,
+      rbac.hasPermission("can-write-api")
+    ];
+    this.middleware.index = readMiddleware;
+    this.middleware.view = readMiddleware;
+    this.middleware.create = writeMiddleware;
+    this.middleware.update = writeMiddleware;
+    this.middleware.delete = writeMiddleware;
   }
-  /**
-   * Uses json param 'q'
-   */
-  async index(req, res, next) {
-    // Check validation errors
-    const errors = validationResult(req);
-    if (!errors.isEmpty()) {
-      // 400 Bad Request
-      return res.status(400).send(errors.mapped());
-    }
-    const users = await this.Model.query();
-    // 200 OK
-    res.status(200).send(users);
-  }
-  async create(req, res, next) {
-    // 501 Not Implemented
-    res.status(501).end();
-  }
-  async update(req, res, next) {
-    // 501 Not Implemented
-    res.status(501).end();
+  async actionIndex(req, res) {
+    return super.actionIndex(req, res);
   }
 };

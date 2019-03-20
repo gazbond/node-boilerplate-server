@@ -1,14 +1,15 @@
 const jwt = require("jsonwebtoken");
-const {
-  buildCheckFunction,
-  validationResult
-} = require("express-validator/check");
+const { buildCheckFunction } = require("express-validator/check");
 const check = buildCheckFunction(["body", "query"]);
-
 const BassController = require("../../library/BaseController");
 const User = require("../../models/User");
 const passport = require("../../library/helpers/passport");
-const { wrapAsync, getParam } = require("../../library/helpers/utils");
+const {
+  validationErrors,
+  bindMethods,
+  wrapAsync,
+  getParam
+} = require("../../library/helpers/utils");
 
 /**
  * Security controller handles login, register, confirm email and change password.
@@ -20,10 +21,10 @@ module.exports = class SecurityController extends BassController {
    */
   constructor() {
     super();
-    // Options:
-    this.loginRoute = "/security/login";
-    // Route handlers:
-    this.handlers = [
+    // Paths:
+    this.paths.login = "/security/login";
+    // Validations:
+    this.validators.login = [
       check(
         "login",
         "Login should be alpha-numeric and more than 3 characters long"
@@ -46,16 +47,18 @@ module.exports = class SecurityController extends BassController {
         .isLength({ min: 4 })
     ];
     // To get 'this' in instance methods:
-    this.loginGet = this.loginGet.bind(this);
-    this.loginPost = this.loginPost.bind(this);
+    bindMethods(this, ["actionLoginGet", "actionLoginPost"]);
   }
   /**
-   * Returns express.Router() configured with routes/middleware.
+   * Returns express.Router() configured with paths/middleware.
    */
-  initRoutes() {
-    // Routes:
-    this.router.get(this.loginRoute, wrapAsync(this.loginGet));
-    this.router.post(this.loginRoute, this.handlers, wrapAsync(this.loginPost));
+  initRouter() {
+    this.router.get(this.paths.login, wrapAsync(this.actionLoginGet));
+    this.router.post(
+      this.paths.login,
+      this.validators.login,
+      wrapAsync(this.actionLoginPost)
+    );
     return this.router;
   }
   /**
@@ -72,15 +75,15 @@ module.exports = class SecurityController extends BassController {
   /**
    * GET security/login
    */
-  async loginGet(req, res) {
+  async actionLoginGet(req, res) {
     res.render("security/login", this.loginViewParams(req, []));
   }
   /**
    * POST security/login
    */
-  async loginPost(req, res) {
+  async actionLoginPost(req, res) {
     // Check validation errors
-    const errors = validationResult(req);
+    const errors = validationErrors(req);
     if (!errors.isEmpty()) {
       // mapped() means only 1 error per field. Specify fields[] in partials/errors.ejs
       return res.render(
@@ -98,7 +101,7 @@ module.exports = class SecurityController extends BassController {
       return res.render(
         "security/login",
         this.loginViewParams(req, {
-          login: { msg: "Incorrect login" }
+          login: { message: "Incorrect login" }
         })
       );
     }
@@ -108,7 +111,7 @@ module.exports = class SecurityController extends BassController {
       return res.render(
         "security/login",
         this.loginViewParams(req, {
-          password: { msg: "Incorrect password" }
+          password: { message: "Incorrect password" }
         })
       );
     }
