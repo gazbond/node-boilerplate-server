@@ -1,3 +1,8 @@
+# See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
+
+# node.js logs
+npm-debug.log*
+
 # phpstorm project files
 .idea
 
