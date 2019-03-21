@@ -7,10 +7,6 @@ exports.config = {
       url: "http://node:8080",
       keepCookies: true,
       browser: "chrome"
-    },
-    REST: {
-      endpoint: "http://node:8080/api",
-      defaultHeaders: []
     }
   },
   plugins: {
