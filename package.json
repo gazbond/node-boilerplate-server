@@ -7,6 +7,9 @@
   "scripts": {
     "lint": "eslint --format codeframe --ignore-pattern \"node_modules/**/*.js\" \"**/*.js\"",
     "lint:fix": "eslint --fix --ignore-pattern \"node_modules/**/*.js\" \"**/*.js\"",
+    "knex": "knex",
+    "knex:migrate": "knex migrate:latest",
+    "knex:seed": "knex seed:run",
     "test": "npm run lint && npm run test:unit && npm run test:api && npm run test:cept",
     "test:unit": "mocha --recursive tests/unit/**/*.js",
     "test:api": "mocha --recursive tests/api/**/*.js",
