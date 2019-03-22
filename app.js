@@ -5,7 +5,6 @@ const expressLayouts = require("express-ejs-layouts");
 const flash = require("express-flash");
 const session = require("express-session");
 const bodyParser = require("body-parser");
-const cors = require("cors");
 const logger = require("morgan");
 const chalk = require("chalk").default;
 const sqlFormatter = require("sql-formatter");
@@ -67,7 +66,6 @@ routerApi.use(
   // Content-Type: application/json
   bodyParser.json()
 );
-routerApi.use(cors());
 /**
  * API user endpoint.
  */

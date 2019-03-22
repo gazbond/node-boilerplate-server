@@ -2,6 +2,7 @@ const express = require("express");
 const Request = express.request;
 const Response = express.response;
 const Router = express.Router;
+const cors = require("cors");
 const { buildCheckFunction } = require("express-validator/check");
 const check = buildCheckFunction(["params", "query"]);
 const {
@@ -30,12 +31,9 @@ module.exports = class BassEndpoint {
     // Paths:
     this.path = path;
     this.pathWithParam = path + param;
-    this.paths = {
-      index: this.path,
-      view: this.pathWithParam,
-      create: this.path,
-      update: this.pathWithParam,
-      delete: this.pathWithParam
+    // Cores:
+    this.cors = {
+      methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"]
     };
     // Validations:
     this.check = {
@@ -81,28 +79,29 @@ module.exports = class BassEndpoint {
    * @return {Router} express.Router() configured with paths/middleware.
    */
   initRouter() {
+    this.router.options(this.path, cors(this.cors));
     this.router.get(
-      this.paths.index,
+      this.path,
       this.middleware.index.concat(this.validators.index),
       wrapAsync(this.actionIndex)
     );
     this.router.get(
-      this.paths.view,
+      this.pathWithParam,
       this.middleware.view.concat(this.validators.view),
       wrapAsync(this.actionView)
     );
     this.router.post(
-      this.paths.create,
+      this.path,
       this.middleware.create.concat(this.validators.create),
       wrapAsync(this.actionCreate)
     );
     this.router.put(
-      this.paths.update,
+      this.pathWithParam,
       this.middleware.update.concat(this.validators.update),
       wrapAsync(this.actionUpdate)
     );
     this.router.delete(
-      this.paths.delete,
+      this.path,
       this.middleware.delete.concat(this.validators.delete),
       wrapAsync(this.actionDelete)
     );
