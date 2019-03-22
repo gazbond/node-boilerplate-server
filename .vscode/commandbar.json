@@ -25,7 +25,7 @@
       "text": "cept",
       "tooltip": "run codecept tests in docker container",
       "color": "yellow",
-      "command": "docker exec node-boilerplate-app_node_1 npm run test-cept",
+      "command": "docker exec node-boilerplate-app_node_1 npm run test:cept",
       "alignment": "left",
       "skipTerminateQuickPick": false,
       "priority": 4
@@ -34,7 +34,7 @@
       "text": "api",
       "tooltip": "run mocha api tests in docker container",
       "color": "yellow",
-      "command": "docker exec node-boilerplate-app_node_1 npm run test-api",
+      "command": "docker exec node-boilerplate-app_node_1 npm run test:api",
       "alignment": "left",
       "skipTerminateQuickPick": false,
       "priority": 3
@@ -43,7 +43,7 @@
       "text": "unit",
       "tooltip": "run mocha unit tests in docker container",
       "color": "yellow",
-      "command": "docker exec node-boilerplate-app_node_1 npm run test-unit",
+      "command": "docker exec node-boilerplate-app_node_1 npm run test:unit",
       "alignment": "left",
       "skipTerminateQuickPick": false,
       "priority": 2
