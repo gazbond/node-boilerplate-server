@@ -79,7 +79,7 @@ module.exports = class BassEndpoint {
    * @return {Router} express.Router() configured with paths/middleware.
    */
   initRouter() {
-    this.router.options(this.path, cors(this.cors));
+    this.router.use(this.path, cors(this.cors));
     this.router.get(
       this.path,
       this.middleware.index.concat(this.validators.index),
