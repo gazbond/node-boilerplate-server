@@ -4,31 +4,13 @@
   "skipErrorMessage": true,
   "commands": [
     {
-      "text": "unit",
-      "tooltip": "run mocha unit tests in docker container",
+      "text": "migrate",
+      "tooltip": "run knex migrations in docker container",
       "color": "yellow",
-      "command": "docker exec node-boilerplate-app_node_1 npm run test-unit",
+      "command": "docker exec node-boilerplate-app_node_1 node node_modules/.bin/knex migrate:latest",
       "alignment": "left",
       "skipTerminateQuickPick": false,
-      "priority": 1
-    },
-    {
-      "text": "api",
-      "tooltip": "run mocha api tests in docker container",
-      "color": "yellow",
-      "command": "docker exec node-boilerplate-app_node_1 npm run test-api",
-      "alignment": "left",
-      "skipTerminateQuickPick": false,
-      "priority": 2
-    },
-    {
-      "text": "cept",
-      "tooltip": "run codecept tests in docker container",
-      "color": "yellow",
-      "command": "docker exec node-boilerplate-app_node_1 npm run test-cept",
-      "alignment": "left",
-      "skipTerminateQuickPick": false,
-      "priority": 3
+      "priority": 6
     },
     {
       "text": "seed",
@@ -37,16 +19,43 @@
       "command": "docker exec node-boilerplate-app_node_1 node node_modules/.bin/knex seed:run",
       "alignment": "left",
       "skipTerminateQuickPick": false,
+      "priority": 5
+    },
+    {
+      "text": "cept",
+      "tooltip": "run codecept tests in docker container",
+      "color": "yellow",
+      "command": "docker exec node-boilerplate-app_node_1 npm run test-cept",
+      "alignment": "left",
+      "skipTerminateQuickPick": false,
       "priority": 4
     },
     {
-      "text": "migrate",
-      "tooltip": "run knex migrations in docker container",
+      "text": "api",
+      "tooltip": "run mocha api tests in docker container",
       "color": "yellow",
-      "command": "docker exec node-boilerplate-app_node_1 node node_modules/.bin/knex migrate:latest",
+      "command": "docker exec node-boilerplate-app_node_1 npm run test-api",
       "alignment": "left",
       "skipTerminateQuickPick": false,
-      "priority": 5
+      "priority": 3
+    },
+    {
+      "text": "unit",
+      "tooltip": "run mocha unit tests in docker container",
+      "color": "yellow",
+      "command": "docker exec node-boilerplate-app_node_1 npm run test-unit",
+      "alignment": "left",
+      "skipTerminateQuickPick": false,
+      "priority": 2
+    },
+    {
+      "text": "clear",
+      "tooltip": "clear ./tests/_output",
+      "color": "yellow",
+      "command": "rm -R tests/_output && mkdir tests/_output",
+      "alignment": "left",
+      "skipTerminateQuickPick": false,
+      "priority": 1
     }
   ]
 }
