@@ -34,11 +34,13 @@ module.exports = class BassEndpoint {
     // Cores:
     this.cors = {
       methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+      allowedHeaders: ["Content-Type", "Authorization", "Content-Range"],
       exposedHeaders: [
         "X-Pagination-Total-Count",
         "X-Pagination-Current-Page",
         "X-Pagination-Per-Page",
-        "X-Pagination-Page-Count"
+        "X-Pagination-Page-Count",
+        "Content-Range"
       ]
     };
     // Validations:
@@ -125,20 +127,26 @@ module.exports = class BassEndpoint {
         errors: errors.mapped()
       });
     }
-    const page = getParam(req, "page", 1);
+    // Indexed from 1
+    const currentPage = getParam(req, "page", 1);
+    // Indexed from 0
+    const page = currentPage > 0 ? currentPage - 1 : 0;
+    // > 0
     const size = getParam(req, "size", 30);
+    // Query
     const response = await this.Model.query().page(page, size);
+    // Response
     const total = response.total;
     const totalPages = Math.ceil(total / size);
-    // let pageCount = totalCount > 0 ? 1 : 0;
     const pageCount = (totalPages + size - 1) / size;
-
     // Headers
     res.header({
       "X-Pagination-Total-Count": total,
-      "X-Pagination-Current-Page": page,
+      "X-Pagination-Current-Page": currentPage,
       "X-Pagination-Per-Page": size,
-      "X-Pagination-Page-Count": pageCount
+      "X-Pagination-Page-Count": pageCount,
+      "Content-Range":
+        this.path.replace("/", "") + " 0-" + pageCount + "/" + total
     });
     // 200 OK
     res.status(200).send(response.results);
