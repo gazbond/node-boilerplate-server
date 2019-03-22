@@ -19,8 +19,7 @@ exports.config = {
     stepByStepReport: {
       enabled: true,
       deleteSuccessful: false,
-      fullPageScreenshots: true,
-      output: "./tests/_output/"
+      fullPageScreenshots: true
     }
   },
   include: {},
