@@ -33,7 +33,13 @@ module.exports = class BassEndpoint {
     this.pathWithParam = path + param;
     // Cores:
     this.cors = {
-      methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"]
+      methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+      exposedHeaders: [
+        "X-Pagination-Total-Count",
+        "X-Pagination-Current-Page",
+        "X-Pagination-Per-Page",
+        "X-Pagination-Page-Count"
+      ]
     };
     // Validations:
     this.check = {
@@ -119,11 +125,23 @@ module.exports = class BassEndpoint {
         errors: errors.mapped()
       });
     }
-    const page = getParam(req, "page", 0);
+    const page = getParam(req, "page", 1);
     const size = getParam(req, "size", 30);
-    const models = await this.Model.query().page(page, size);
+    const response = await this.Model.query().page(page, size);
+    const total = response.total;
+    const totalPages = Math.ceil(total / size);
+    // let pageCount = totalCount > 0 ? 1 : 0;
+    const pageCount = (totalPages + size - 1) / size;
+
+    // Headers
+    res.header({
+      "X-Pagination-Total-Count": total,
+      "X-Pagination-Current-Page": page,
+      "X-Pagination-Per-Page": size,
+      "X-Pagination-Page-Count": pageCount
+    });
     // 200 OK
-    res.status(200).send(models);
+    res.status(200).send(response.results);
   }
   /**
    * @param {Request} req
