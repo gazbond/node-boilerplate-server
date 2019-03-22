@@ -49,4 +49,16 @@ exports.seed = async function(knex) {
   await userRole.assignPermission(readPerm);
   await rootUser.assignRoles([adminRole, userRole]);
   await gazbondUser.assignRole(userRole);
+
+  // Lots more user role users
+  const faker = require("faker");
+  const usersCount = 30;
+  for (let i = 0; i <= usersCount; i++) {
+    const current = await User.query().insert({
+      username: faker.internet.userName(),
+      email: faker.internet.email(),
+      password: "password"
+    });
+    await current.assignRole(userRole);
+  }
 };
