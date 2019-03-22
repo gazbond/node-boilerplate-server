@@ -1,7 +1,7 @@
 {
-  "name": "node-boilerplate-app",
+  "name": "node-boilerplate-server",
   "version": "1.0.0",
-  "description": "node boilerplate app",
+  "description": "node boilerplate server",
   "author": "gazbond.co.uk",
   "license": "MIT",
   "scripts": {

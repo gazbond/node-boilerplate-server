@@ -11,7 +11,7 @@ const { Model } = require("objection");
 Model.knex(knex);
 
 module.exports = {
-  name: "Node boilerplate app",
+  name: "Node boilerplate server",
   knex: knex,
   jwt: {
     secretOrKey: "md6a-gbs89le72ha8we7js-zo-awns67uw",
