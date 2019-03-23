@@ -53,7 +53,7 @@ const wrapAsync = func => {
  *
  * @param {Request} req
  * @param {string} name
- * @param {null|string|number|boolean} def
+ * @param {*} def
  */
 const getParam = (req, name, def = "") => {
   if (req.query[name]) {
