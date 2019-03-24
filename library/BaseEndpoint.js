@@ -34,7 +34,7 @@ module.exports = class BassEndpoint {
     // Cores:
     this.cors = {
       methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-      allowedHeaders: ["Content-Type", "Authorization", "Content-Range"],
+      allowedHeaders: ["Content-Type", "Authorization"],
       exposedHeaders: [
         "X-Pagination-Total-Count",
         "X-Pagination-Current-Page",
@@ -54,12 +54,12 @@ module.exports = class BassEndpoint {
       page: check("page", "Param 'page' is not an integer")
         .optional()
         .isInt(),
-      size: check("size", "Param 'size' is not an integer")
+      perPage: check("perPage", "Param 'perPage' is not an integer")
         .optional()
         .isInt()
     };
     this.validators = {
-      index: [this.check.page, this.check.size],
+      index: [this.check.page, this.check.perPage],
       view: [this.check.id],
       create: [],
       update: [this.check.id],
@@ -127,24 +127,24 @@ module.exports = class BassEndpoint {
         errors: errors.mapped()
       });
     }
+    // Always have params or default
+    const perPage = getParam(req, "perPage", 30);
     // Indexed from 1
     const currentPage = getParam(req, "page", 1);
     // Indexed from 0
     const page = currentPage > 0 ? currentPage - 1 : 0;
-    // > 0
-    const size = getParam(req, "size", 30);
     // Query
-    const response = await this.Model.query().page(page, size);
+    const response = await this.Model.query().page(page, perPage);
     // Response
     const total = response.total;
-    const totalPages = Math.ceil(total / size);
-    const pageCount = (totalPages + size - 1) / size;
+    const pageCount = Math.ceil(total / perPage);
     // Headers
     res.header({
       "X-Pagination-Total-Count": total,
       "X-Pagination-Current-Page": currentPage,
-      "X-Pagination-Per-Page": size,
+      "X-Pagination-Per-Page": perPage,
       "X-Pagination-Page-Count": pageCount,
+      // For react-admin
       "Content-Range":
         this.path.replace("/", "") + " 0-" + pageCount + "/" + total
     });
