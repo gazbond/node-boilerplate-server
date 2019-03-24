@@ -1,6 +1,8 @@
 const jwt = require("jsonwebtoken");
 const { buildCheckFunction } = require("express-validator/check");
 const check = buildCheckFunction(["body", "query"]);
+const bodyParser = require("body-parser");
+const cors = require("cors");
 const BassController = require("../../library/BaseController");
 const User = require("../../models/User");
 const passport = require("../../library/helpers/passport");
@@ -46,6 +48,12 @@ module.exports = class SecurityController extends BassController {
         .isAlphanumeric()
         .isLength({ min: 4 })
     ];
+    // Cores:
+    this.cors = {
+      methods: ["GET", "POST"],
+      allowedHeaders: ["Content-Type"],
+      exposedHeaders: ["Authorization"]
+    };
     // To get 'this' in instance methods:
     bindMethods(this, ["actionLoginGet", "actionLoginPost"]);
   }
@@ -53,6 +61,12 @@ module.exports = class SecurityController extends BassController {
    * Returns express.Router() configured with paths/middleware.
    */
   initRouter() {
+    this.router.use(this.paths.login, cors(this.cors));
+    this.router.use(
+      this.paths.login,
+      // Content-Type: application/json
+      bodyParser.json()
+    );
     this.router.get(this.paths.login, wrapAsync(this.actionLoginGet));
     this.router.post(
       this.paths.login,
