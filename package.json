@@ -15,7 +15,7 @@
     "test:api": "mocha --recursive tests/api/**/*.js",
     "test:cept": "codeceptjs run --steps",
     "start": "node server.js",
-    "start:debug": "nodemon --inspect=0.0.0.0 server.js && npm run start:email",
+    "start:debug": "nodemon --inspect=0.0.0.0 server.js",
     "start:docker": "npm install --quiet && npm run start:debug"
   },
   "dependencies": {
