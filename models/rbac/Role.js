@@ -38,42 +38,71 @@ module.exports = class Role extends BaseClass {
     };
   }
   /**
-   * @param {Permission} permission
+   * @param {Permission|string} permission
    */
   async assignPermission(permission) {
+    let permissionName = permission;
+    if (typeof permission === "object") {
+      permissionName = permission.name;
+    }
     await PermissionAssignment.query().insert({
-      permission_name: permission.name,
+      permission_name: permissionName,
       role_name: this.name
     });
   }
   /**
-   * @param {Permission} permission
+   * @param {Permission|string} permission
    */
   async removePermission(permission) {
-    await PermissionAssignment.query().deleteById([permission.name, this.name]);
+    let permissionName = permission;
+    if (typeof permission === "object") {
+      permissionName = permission.name;
+    }
+    await PermissionAssignment.query().deleteById([permissionName, this.name]);
   }
   /**
-   * @param {Permission[]} permissions
+   * @param {Permission[]|string[]} permissions
    */
   async assignPermissions(permissions) {
     const inserts = [];
     permissions.forEach(permission => {
+      let permissionName = permission;
+      if (typeof permission === "object") {
+        permissionName = permission.name;
+      }
       inserts.push({
-        permission_name: permission.name,
+        permission_name: permissionName,
         role_name: this.name
       });
     });
     await PermissionAssignment.query().insert(inserts);
   }
   /**
-   * @param {Permission[]} permissions
+   * @param {Permission[]|string[]} permissions
    */
   async removePermissions(permissions) {
-    permissions.forEach(async permission => {
-      await PermissionAssignment.query().deleteById([
-        permission.name,
-        this.name
-      ]);
+    const deletes = [];
+    permissions.forEach(permission => {
+      let permissionName = permission;
+      if (typeof permission === "object") {
+        permissionName = permission.name;
+      }
+      deletes.push([permissionName, this.name]);
     });
+    await PermissionAssignment.query()
+      .delete()
+      .whereInComposite(["permission_name", "role_name"], deletes);
+  }
+  /**
+   * Remove permission assignments.
+   */
+  async $beforeDelete(queryContext) {
+    await super.$beforeDelete(queryContext);
+    // Load permissions
+    const permissions = await this.$relatedQuery("permissions");
+    // Remove permission assignments
+    if (permissions && permissions.length > 0) {
+      await this.removePermissions(permissions);
+    }
   }
 };

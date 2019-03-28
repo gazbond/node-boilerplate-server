@@ -1,4 +1,3 @@
-const crypto = require("crypto-promise");
 const { Model } = require("objection");
 const BaseModel = require("../library/BaseModel");
 const Password = require("objection-password")();
@@ -7,6 +6,11 @@ const Unique = require("objection-unique")({
   identifiers: ["id"]
 });
 const BaseClass = Password(Unique(BaseModel));
+
+const crypto = require("crypto-promise");
+const config = require("../config");
+const { sendEmail } = require("../library/helpers/email");
+
 const Role = require("./rbac/Role");
 const RoleAssignment = require("./rbac/RoleAssignment");
 
@@ -58,50 +62,80 @@ module.exports = class User extends BaseClass {
     return super.query();
   }
   /**
-   * @param {Role} role
+   * @param {Role|string} role
    */
   async assignRole(role) {
+    let roleName = role;
+    if (typeof role === "object") {
+      roleName = role.name;
+    }
     await RoleAssignment.query().insert({
-      role_name: role.name,
+      role_name: roleName,
       user_id: this.id
     });
   }
   /**
-   * @param {Role} role
+   * @param {Role|string} role
    */
   async removeRole(role) {
-    await RoleAssignment.query().deleteById([role.name, this.id]);
+    let roleName = role;
+    if (typeof role === "object") {
+      roleName = role.name;
+    }
+    await RoleAssignment.query().deleteById([roleName, this.id]);
   }
   /**
-   * @param {Role[]} roles
+   * @param {Role[]|string[]} roles
    */
   async assignRoles(roles) {
     const inserts = [];
     roles.forEach(role => {
+      let roleName = role;
+      if (typeof role === "object") {
+        roleName = role.name;
+      }
       inserts.push({
-        role_name: role.name,
+        role_name: roleName,
         user_id: this.id
       });
     });
     await RoleAssignment.query().insert(inserts);
   }
   /**
-   * @param {Role[]} roles
+   * @param {Role[]|string[]} roles
    */
   async removeRoles(roles) {
-    roles.forEach(async role => {
-      await RoleAssignment.query().deleteById([role.name, this.id]);
+    const deletes = [];
+    roles.forEach(role => {
+      let roleName = role;
+      if (typeof role === "object") {
+        roleName = role.name;
+      }
+      deletes.push([roleName, this.id]);
     });
+    await RoleAssignment.query()
+      .delete()
+      .whereInComposite(["role_name", "user_id"], deletes);
   }
   /**
    * Generate auth key.
    */
-  $beforeInsert(queryContext) {
-    const maybePromise = super.$beforeInsert(queryContext);
-    return Promise.resolve(maybePromise).then(async () => {
-      // Set auth key to random string of length 32 (2 per hex i.e. 16 bytes)
-      const buffer = await crypto.randomBytes(16);
-      this.auth_key = buffer.toString("hex");
-    });
+  async $beforeInsert(queryContext) {
+    await super.$beforeInsert(queryContext);
+    // Set auth key to random string of length 32 (2 per hex i.e. 16 bytes)
+    const buffer = await crypto.randomBytes(16);
+    this.auth_key = buffer.toString("hex");
+  }
+  /**
+   * Remove role assignments.
+   */
+  async $beforeDelete(queryContext) {
+    await super.$beforeDelete(queryContext);
+    // Load roles
+    const roles = await this.$relatedQuery("roles");
+    // Remove role assignments
+    if (roles && roles.length > 0) {
+      await this.removeRoles(roles);
+    }
   }
 };
