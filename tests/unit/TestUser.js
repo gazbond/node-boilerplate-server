@@ -1,16 +1,10 @@
 process.env.ENVIRONMENT = "testing";
 
 const expect = require("expect.js");
-const chai = require("chai");
-const chaiHttp = require("chai-http");
-chai.use(chaiHttp);
-
 const { ValidationError } = require("objection");
 
 const { knex } = require("../../config");
 const User = require("../../models/User");
-const Role = require("../../models/rbac/Role");
-const Permission = require("../../models/rbac/Permission");
 
 before(async function() {
   await knex.migrate.latest();
@@ -87,29 +81,5 @@ describe("Test User model", function() {
     expect(user.updated_at).to.be.a(Date);
     expect(user.created_at).to.eql(created_at);
     expect(user.updated_at).to.not.eql(updated_at);
-  });
-  it("tests User removing roles and permissions", async function() {
-    // Load user
-    const user = await User.query()
-      .eager("roles")
-      .where({
-        username: "root"
-      })
-      .first();
-    expect(user.roles).to.have.length(2);
-    // Load role and permission
-    const role = await Role.query()
-      .eager("permissions")
-      .findById("admin");
-    expect(role.permissions).to.have.length(2);
-    const permission = await Permission.query().findById("can-read-api");
-    // Remove role/permission
-    user.removeRole(role);
-    role.removePermission(permission);
-    // Check removals worked
-    const roles = await user.$relatedQuery("roles");
-    expect(roles).to.have.length(1);
-    const permissions = await role.$relatedQuery("permissions");
-    expect(permissions).to.have.length(1);
   });
 });
