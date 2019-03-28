@@ -109,7 +109,7 @@ module.exports = class BassEndpoint {
       wrapAsync(this.actionUpdate)
     );
     this.router.delete(
-      this.path,
+      this.pathWithParam,
       this.middleware.delete.concat(this.validators.delete),
       wrapAsync(this.actionDelete)
     );
