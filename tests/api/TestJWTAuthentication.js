@@ -1,14 +1,18 @@
+process.env.ENVIRONMENT = "testing";
+
 const expect = require("expect.js");
 const chai = require("chai");
 const chaiHttp = require("chai-http");
 chai.use(chaiHttp);
 
-const knex = require("../../config/test.conf").knex;
+const { knex } = require("../../config");
 const app = require("../../app");
 
 before(async function() {
   await knex.migrate.latest();
-  await knex.seed.run();
+  await knex.seed.run({
+    directory: "./seeds/test"
+  });
 });
 after(async function() {
   await knex.destroy();
@@ -36,6 +40,6 @@ describe("Test JWT authentication", function() {
       .get("/api/users")
       .set("Authorization", `Bearer ${token}`);
     expect(response.status).to.eql(200);
-    expect(response.body.results).to.be.an(Array);
+    expect(response.body).to.be.an(Array);
   });
 });

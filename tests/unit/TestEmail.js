@@ -1,3 +1,5 @@
+process.env.ENVIRONMENT = "testing";
+
 const expect = require("expect.js");
 const { transport, sendEMail } = require("../../library/helpers/email");
 

@@ -1,21 +1,24 @@
+process.env.ENVIRONMENT = "testing";
+
 const expect = require("expect.js");
 const chai = require("chai");
 const chaiHttp = require("chai-http");
 chai.use(chaiHttp);
 
 const { ValidationError } = require("objection");
-const knex = require("../../config/test.conf").knex;
+
+const { knex } = require("../../config");
 const User = require("../../models/User");
 const Role = require("../../models/rbac/Role");
 const Permission = require("../../models/rbac/Permission");
-
-const { sleep } = require("../../library/helpers/utils");
 
 before(async function() {
   await knex.migrate.latest();
 });
 beforeEach(async function() {
-  await knex.seed.run();
+  await knex.seed.run({
+    directory: "./seeds/test"
+  });
 });
 after(async function() {
   await knex.destroy();

@@ -1,15 +1,19 @@
+process.env.ENVIRONMENT = "testing";
+
 const expect = require("expect.js");
 const chai = require("chai");
 const chaiHttp = require("chai-http");
 chai.use(chaiHttp);
 
-const knex = require("../../config/test.conf").knex;
+const { knex } = require("../../config");
 const app = require("../../app");
 
 let token;
 before(async function() {
   await knex.migrate.latest();
-  await knex.seed.run();
+  await knex.seed.run({
+    directory: "./seeds/test"
+  });
   // Login form returns { Authorization: <token> }
   const login = await chai
     .request(app)
@@ -20,7 +24,6 @@ before(async function() {
       password: "password"
     });
   token = login.body.Authorization;
-  console.log("token: ", token);
 });
 after(async function() {
   await knex.destroy();
@@ -33,8 +36,8 @@ describe("Test UserEndpoint", function() {
       .get("/api/users")
       .set("Authorization", `Bearer ${token}`);
     expect(response.status).to.equal(200);
-    expect(response.body.results).to.be.an(Array);
-    response.body.results.forEach(async user => {
+    expect(response.body).to.be.an(Array);
+    response.body.forEach(async user => {
       const id = user.id;
       const current = await chai
         .request(app)
@@ -56,7 +59,6 @@ describe("Test UserEndpoint", function() {
         password: "password"
       });
     id = response.body.id;
-    console.log("id: ", id);
     expect(response.status).to.equal(200);
     expect(response.body.username).to.eql("gazb");
     expect(response.body.email).to.eql("me@notu.com");
