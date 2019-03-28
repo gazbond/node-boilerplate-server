@@ -223,11 +223,12 @@ module.exports = class BassEndpoint {
       return res.status(400).send(errors.mapped());
     }
     const id = getParam(req, "id");
-    const result = await this.Model.query().deleteById(id);
-    if (!result) {
+    const model = await this.Model.query().findById(id);
+    if (!model) {
       // 404 Not Found
       return res.status(404).end();
     }
+    await model.$query().delete();
     // 200 OK
     res.status(200).end();
   }
