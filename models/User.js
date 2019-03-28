@@ -127,6 +127,26 @@ module.exports = class User extends BaseClass {
     this.auth_key = buffer.toString("hex");
   }
   /**
+   * Assign default role(s) and send confirmation email.
+   */
+  async $afterInsert(queryContext) {
+    await super.$afterInsert(queryContext);
+    // Add roles
+    const roles = config.models.user.roles || false;
+    if (roles && roles.length > 0) {
+      await this.assignRoles(roles);
+    }
+    // Send confirmation email
+    const emailConfirmation = config.models.user.emailConfirmation || false;
+    if (emailConfirmation) {
+      await sendEmail(this.email, "register", {
+        name: config.name,
+        username: this.username,
+        url: "link-goes-here"
+      });
+    }
+  }
+  /**
    * Remove role assignments.
    */
   async $beforeDelete(queryContext) {
