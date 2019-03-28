@@ -3,8 +3,7 @@
  * Config.
  * ------------------------------------------------------
  */
-const environment = process.env.ENVIRONMENT || "development";
-const config = require("../knexfile")[environment];
+const config = require("../knexfile")["development"];
 const knex = require("knex")(config);
 // Provide connection to models.
 const { Model } = require("objection");
@@ -27,6 +26,12 @@ module.exports = {
         user: "",
         pass: ""
       }
+    }
+  },
+  models: {
+    user: {
+      emailConfirmation: true,
+      roles: ["user"]
     }
   }
 };

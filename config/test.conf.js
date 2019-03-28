@@ -3,8 +3,7 @@
  * Config.
  * ------------------------------------------------------
  */
-const environment = process.env.ENVIRONMENT || "testing";
-const config = require("../knexfile")[environment];
+const config = require("../knexfile")["testing"];
 const knex = require("knex")(config);
 // Provide connection to models.
 const { Model } = require("objection");
@@ -21,6 +20,12 @@ module.exports = {
     from: "no-reply@node-boilerplate-server.com",
     transport: {
       jsonTransport: true
+    }
+  },
+  models: {
+    user: {
+      emailConfirmation: true,
+      roles: ["user"]
     }
   }
 };
