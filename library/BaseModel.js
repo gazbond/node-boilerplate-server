@@ -8,21 +8,23 @@ module.exports = class BaseModel extends BaseClass {
     super();
     this.$autoTimestamps = true;
   }
-  $beforeInsert(queryContext) {
-    const maybePromise = super.$beforeInsert(queryContext);
-    return Promise.resolve(maybePromise).then(() => {
-      if (this.$autoTimestamps) {
-        this.created_at = new Date().toISOString();
-        this.updated_at = new Date().toISOString();
-      }
-    });
+  /**
+   * Generate created/updated timestamps.
+   */
+  async $beforeInsert(queryContext) {
+    await super.$beforeInsert(queryContext);
+    if (this.$autoTimestamps) {
+      this.created_at = new Date().toISOString();
+      this.updated_at = new Date().toISOString();
+    }
   }
-  $beforeUpdate(opt, queryContext) {
-    const maybePromise = super.$beforeUpdate(opt, queryContext);
-    return Promise.resolve(maybePromise).then(() => {
-      if (this.$autoTimestamps) {
-        this.updated_at = new Date().toISOString();
-      }
-    });
+  /**
+   * Generate updated timestamp.
+   */
+  async $beforeUpdate(opt, queryContext) {
+    await super.$beforeUpdate(opt, queryContext);
+    if (this.$autoTimestamps) {
+      this.updated_at = new Date().toISOString();
+    }
   }
 };
