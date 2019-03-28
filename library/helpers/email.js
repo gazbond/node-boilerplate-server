@@ -42,7 +42,7 @@ const email = new Email({
  * @param {string} template
  * @param {{}} locals
  */
-const sendEMail = (toAddress, template, locals) => {
+const sendEmail = (toAddress, template, locals) => {
   return email.send({
     template: template,
     message: {
@@ -52,4 +52,4 @@ const sendEMail = (toAddress, template, locals) => {
   });
 };
 
-module.exports = { transport, sendEMail };
+module.exports = { transport, sendEmail };
