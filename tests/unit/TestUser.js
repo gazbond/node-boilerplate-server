@@ -5,6 +5,7 @@ const { ValidationError } = require("objection");
 
 const { knex } = require("../../config");
 const User = require("../../models/User");
+const Token = require("../../models/Token");
 
 before(async function() {
   await knex.migrate.latest();
@@ -91,5 +92,20 @@ describe("Test User model", function() {
     });
     const roles = await user.$relatedQuery("roles");
     expect(roles).to.have.length(1);
+  });
+  it("tests User creates confirmation token", async function() {
+    // Insert new user
+    const user = await User.query().insertAndFetch({
+      username: "gaz",
+      email: "test@gazbond.co.uk",
+      password: "password"
+    });
+    // Load tokens
+    let tokens = await user.$relatedQuery("tokens");
+    expect(tokens).to.have.length(1);
+    // Search tokens
+    let token = tokens[0];
+    tokens = await Token.searchTokens(token.user_id, token.code);
+    expect(tokens).to.have.length(1);
   });
 });

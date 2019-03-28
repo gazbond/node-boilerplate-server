@@ -13,6 +13,7 @@ const { sendEmail } = require("../library/helpers/email");
 
 const Role = require("./rbac/Role");
 const RoleAssignment = require("./rbac/RoleAssignment");
+const Token = require("./Token");
 
 module.exports = class User extends BaseClass {
   static get tableName() {
@@ -51,6 +52,14 @@ module.exports = class User extends BaseClass {
             to: "rbac_role_assignment.role_name"
           },
           to: "rbac_role.name"
+        }
+      },
+      tokens: {
+        relation: Model.HasManyRelation,
+        modelClass: Token,
+        join: {
+          from: "user_identity.id",
+          to: "user_token.user_id"
         }
       }
     };
@@ -136,13 +145,18 @@ module.exports = class User extends BaseClass {
     if (roles && roles.length > 0) {
       await this.assignRoles(roles);
     }
-    // Send confirmation email
     const emailConfirmation = config.models.user.emailConfirmation || false;
     if (emailConfirmation) {
+      // Create token
+      const token = await Token.query().insert({
+        type: Token.TYPE_CONFIRMATION,
+        user_id: this.id
+      });
+      // Send confirmation email
       await sendEmail(this.email, "register", {
         name: config.name,
         username: this.username,
-        url: "link-goes-here"
+        url: `security/token/${token.user_id}/${token.code}`
       });
     }
   }
@@ -156,6 +170,18 @@ module.exports = class User extends BaseClass {
     // Remove role assignments
     if (roles && roles.length > 0) {
       await this.removeRoles(roles);
+    }
+    // Load tokens
+    const tokens = await this.$relatedQuery("tokens");
+    // Remove tokens
+    if (tokens && tokens.length > 0) {
+      const deletes = [];
+      tokens.forEach(token => {
+        deletes.push([token.type, token.user_id, token.code]);
+      });
+      await Token.query()
+        .delete()
+        .whereInComposite(["type", "user_id", "code"], deletes);
     }
   }
 };

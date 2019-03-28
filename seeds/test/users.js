@@ -6,6 +6,8 @@ exports.seed = async function(knex) {
   await knex("rbac_permission_assignment").del();
   await knex("rbac_permission").del();
   await knex("rbac_role").del();
+  await knex("user_token").del();
+  await knex("user_profile").del();
   await knex("user_identity").del();
 
   /**
