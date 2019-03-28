@@ -10,13 +10,7 @@ const User = require("../../models/User");
  * Config.
  * ------------------------------------------------------
  */
-const environment = process.env.ENVIRONMENT || "development";
-let configPath = "../../config/dev.conf";
-if (environment === "testing") {
-  configPath = "../../config/test.conf";
-}
-
-const { secretOrKey, expiresIn } = require(configPath).jwt;
+const { secretOrKey, expiresIn } = require("../../config").jwt;
 
 /**
  * Extract token from Authorization/Bearer header.

@@ -5,12 +5,7 @@ const chalk = require("chalk").default;
  * Config.
  * ------------------------------------------------------
  */
-const environment = process.env.ENVIRONMENT || "development";
-let configPath = "./config/dev.conf";
-if (environment == "testing") {
-  configPath = "./config/test.conf";
-}
-const config = require(configPath);
+const config = require("./config");
 
 /**
  * ------------------------------------------------------

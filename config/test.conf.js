@@ -18,15 +18,9 @@ module.exports = {
     expiresIn: "2 days"
   },
   email: {
-    from: "node-boilerplate-server@gazbond.co.uk",
+    from: "no-reply@node-boilerplate-server.com",
     transport: {
-      pool: true,
-      secure: true,
-      service: "Gmail",
-      auth: {
-        user: "",
-        pass: ""
-      }
+      jsonTransport: true
     }
   }
 };
