@@ -12,7 +12,7 @@
     "knex:seed": "knex seed:run",
     "test": "npm run lint && npm run test:unit && npm run test:api && npm run test:cept",
     "test:unit": "mocha --timeout 15000 --recursive tests/unit/**/*.js",
-    "test:api": "mocha --recursive tests/api/**/*.js",
+    "test:api": "mocha --timeout 15000 --recursive tests/api/**/*.js",
     "test:cept": "codeceptjs run --steps",
     "start": "node server.js",
     "start:debug": "nodemon --inspect=0.0.0.0 server.js",
