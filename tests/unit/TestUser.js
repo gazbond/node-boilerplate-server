@@ -82,4 +82,14 @@ describe("Test User model", function() {
     expect(user.created_at).to.eql(created_at);
     expect(user.updated_at).to.not.eql(updated_at);
   });
+  it("tests User creates role assignments from config file", async function() {
+    // Insert new user
+    const user = await User.query().insertAndFetch({
+      username: "gaz",
+      email: "test@gazbond.co.uk",
+      password: "password"
+    });
+    const roles = await user.$relatedQuery("roles");
+    expect(roles).to.have.length(1);
+  });
 });
