@@ -1,7 +1,7 @@
 process.env.ENVIRONMENT = "testing";
 
 const expect = require("expect.js");
-const { transport, sendEMail } = require("../../library/helpers/email");
+const { transport, sendEmail } = require("../../library/helpers/email");
 
 after(async function() {
   await transport.close();
@@ -9,7 +9,7 @@ after(async function() {
 
 describe("Test email helper", function() {
   it("tests sending email with register template", async function() {
-    const response = await sendEMail("dev@gazbond.co.uk", "register", {
+    const response = await sendEmail("dev@gazbond.co.uk", "register", {
       name: "node-boilerplate-server",
       username: "Gazbond",
       email: "dev@gazbond.co.uk",
