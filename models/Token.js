@@ -2,9 +2,17 @@ const { Model } = require("objection");
 const { DbErrors } = require("objection-db-errors");
 const BaseClass = DbErrors(Model);
 
+const ms = require("ms");
 const crypto = require("crypto-promise");
-const User = require("./User");
 
+const {
+  models: { user }
+} = require("../config");
+
+/**
+ * Token represents a random string belonging to a user.
+ * It is used to verify user actions e.g. reset password.
+ */
 module.exports = class Token extends BaseClass {
   static get tableName() {
     return "user_token";
@@ -23,6 +31,8 @@ module.exports = class Token extends BaseClass {
     };
   }
   static get relationMappings() {
+    // Lazy loaded to avoid require loop
+    const User = require("./User");
     return {
       user: {
         relation: Model.BelongsToOneRelation,
@@ -41,16 +51,14 @@ module.exports = class Token extends BaseClass {
     return 1;
   }
   /**
-   * @param {number} user_id
-   * @param {string} code
-   * @param {number} type
+   * Check if token has expired.
    */
-  static searchTokens(user_id, code, type = undefined) {
-    const where = { user_id: user_id, code: code };
-    if (type) {
-      where.type = type;
-    }
-    return this.query().where(where);
+  expired() {
+    // In milliseconds
+    const now = new Date().getTime();
+    const createdAt = new Date(this.created_at).getTime();
+    const expiresAt = createdAt + Number.parseInt(ms(user.confirmWithin));
+    return now > expiresAt;
   }
   /**
    * Generate auth key.
