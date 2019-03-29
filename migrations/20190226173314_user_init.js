@@ -12,6 +12,7 @@ exports.up = async function(knex) {
     table.string("email", 255).notNullable();
     table.string("password", 60);
     table.string("auth_key", 32);
+    table.timestamp("confirmed_at");
     table.timestamps();
   });
   await knex.schema.createTable("user_profile", function(table) {

@@ -37,7 +37,8 @@ exports.seed = async function(knex) {
   const rootUser = await User.query().insertAndFetch({
     username: "root",
     email: "dev@gazbond.co.uk",
-    password: "password"
+    password: "password",
+    confirmed_at: new Date().toISOString()
   });
   await rootUser.assignRole(adminRole);
 
@@ -47,6 +48,7 @@ exports.seed = async function(knex) {
   const gazbondUser = await User.query().insertAndFetch({
     username: "gazbond",
     email: "gaz@gazbond.co.uk",
-    password: "password"
+    password: "password",
+    confirmed_at: new Date().toISOString()
   });
 };
