@@ -8,9 +8,13 @@ const Unique = require("objection-unique")({
 const BaseClass = Password(Unique(BaseModel));
 
 const crypto = require("crypto-promise");
-const config = require("../config");
+const {
+  name,
+  models: {
+    user: { emailConfirmation, roles }
+  }
+} = require("../config");
 const { sendEmail } = require("../library/helpers/email");
-
 const Role = require("./rbac/Role");
 const RoleAssignment = require("./rbac/RoleAssignment");
 const Token = require("./Token");
@@ -127,6 +131,24 @@ module.exports = class User extends BaseClass {
       .whereInComposite(["role_name", "user_id"], deletes);
   }
   /**
+   * Create token and email confirm link.
+   */
+  async sendEmailConfirmation() {
+    // Create token
+    const token = await Token.query().insert({
+      type: Token.TYPE_CONFIRMATION,
+      user_id: this.id
+    });
+    // Send confirmation email
+    await sendEmail(this.email, "register", {
+      name: name,
+      username: this.username,
+      url: `http://localhost:8080/security/confirm/${token.user_id}?code=${
+        token.code
+      }`
+    });
+  }
+  /**
    * Generate auth key.
    */
   async $beforeInsert(queryContext) {
@@ -141,23 +163,11 @@ module.exports = class User extends BaseClass {
   async $afterInsert(queryContext) {
     await super.$afterInsert(queryContext);
     // Add roles
-    const roles = config.models.user.roles || false;
     if (roles && roles.length > 0) {
       await this.assignRoles(roles);
     }
-    const emailConfirmation = config.models.user.emailConfirmation || false;
     if (emailConfirmation) {
-      // Create token
-      const token = await Token.query().insert({
-        type: Token.TYPE_CONFIRMATION,
-        user_id: this.id
-      });
-      // Send confirmation email
-      await sendEmail(this.email, "register", {
-        name: config.name,
-        username: this.username,
-        url: `security/token/${token.user_id}/${token.code}`
-      });
+      await this.sendEmailConfirmation();
     }
   }
   /**
