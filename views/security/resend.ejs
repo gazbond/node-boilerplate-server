@@ -1,0 +1,26 @@
+<div class="row mt-5">
+  <div class="col-md-6 m-auto">
+    <div class="card card-body">
+      <h1 class="text-center mb-3">Confirm Email</h1>
+      <p class="text-center">Resend Confirmation Email</p>
+      <form action="/security/resend" method="POST">
+        <div class="form-group">
+          <input
+            type="text"
+            id="email"
+            name="email"
+            class="form-control"
+            placeholder="Enter Email"
+            value="<%= email %>"
+          />
+        </div>
+        <button type="submit" class="btn btn-primary btn-block">Send</button>
+        <br>
+        <% include ../partials/errors %>
+      </form>
+      <p class="text-center lead mt-4">
+        <a href="/security/recover">Forgot Password?</a>
+      </p>
+    </div>
+  </div>
+</div>
