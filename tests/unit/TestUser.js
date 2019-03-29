@@ -105,7 +105,11 @@ describe("Test User model", function() {
     expect(tokens).to.have.length(1);
     // Search tokens
     let token = tokens[0];
-    tokens = await Token.searchTokens(token.user_id, token.code);
+    tokens = await Token.query().where({
+      user_id: token.user_id,
+      type: Token.TYPE_CONFIRMATION,
+      code: token.code
+    });
     expect(tokens).to.have.length(1);
   });
 });
