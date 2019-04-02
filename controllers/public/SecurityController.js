@@ -95,6 +95,16 @@ module.exports = class SecurityController extends BassController {
         })
         .isAlphanumeric()
         .isLength({ min: 4 }),
+      check(
+        "confirm_password",
+        "Invalid confirm password, should be alpha-numeric."
+      )
+        .exists({
+          checkNull: true,
+          checkFalsy: true
+        })
+        .isAlphanumeric()
+        .isLength({ min: 4 }),
       check("id", "Param 'id' should be an integer.")
         .exists({
           checkNull: true,
@@ -260,6 +270,41 @@ module.exports = class SecurityController extends BassController {
     );
   }
   /**
+   * Load token.
+   */
+  async loadToken(req, type) {
+    const id = getParam(req, "id");
+    const code = getParam(req, "code");
+    const token = await Token.query()
+      .where({
+        user_id: id,
+        type: type,
+        code: code
+      })
+      .first();
+    return token;
+  }
+  /**
+   * Parse token.
+   *
+   * @param {Token} token
+   */
+  async parseToken(token) {
+    /**
+     * @property {User} user
+     */
+    const user = await token.$relatedQuery("user");
+    const username = user.username;
+    const notExpired = !token.expired();
+    // Delete token
+    await Token.query().deleteById([token.type, token.user_id, token.code]);
+    return {
+      user,
+      username,
+      notExpired
+    };
+  }
+  /**
    * Utils: construct params passed to:
    * views/security/error.ejs
    * views/security/success.ejs
@@ -284,38 +329,18 @@ module.exports = class SecurityController extends BassController {
         this.confirmViewParams("404", "Bad Request", errors.mapped())
       );
     }
-    // Load token(s)
-    const id = getParam(req, "id");
-    const code = getParam(req, "code");
-    const tokens = await Token.query().where({
-      user_id: id,
-      type: Token.TYPE_CONFIRMATION,
-      code: code
-    });
+    // Load token
+    const token = await this.loadToken(req, Token.TYPE_CONFIRMATION);
     // Not found
-    if (!tokens || tokens.length === 0) {
+    if (!token) {
       return res.render(
         "security/error",
         this.confirmViewParams("Confirmation Failed", "Token Not Found")
       );
     }
-    // Parse token(s)
-    let user;
-    let username;
-    let notExpired = true;
-    let deletes = [];
-    for (let i = 0; i < tokens.length; i++) {
-      const token = tokens[i];
-      if (!user) {
-        user = await token.$relatedQuery("user");
-        username = user.username;
-      }
-      if (token.expired()) {
-        notExpired = false;
-      }
-      deletes.push([token.type, token.user_id, token.code]);
-    }
-    // Token(s) not expired
+    // Parse token
+    const { user, username, notExpired } = await this.parseToken(token);
+    // Token not expired
     let view = "security/success";
     let title = "Email Confirmed";
     let message = "Thank you " + username + ", your email has been confirmed";
@@ -325,20 +350,92 @@ module.exports = class SecurityController extends BassController {
         confirmed_at: new Date().toISOString()
       });
     }
-    // Token(s) expired
+    // Token expired
     else {
       view = "security/error";
       title = "Confirmation Failed";
       message = " Token has expired";
     }
-    // Delete token(s)
-    if (deletes) {
-      await Token.query()
-        .delete()
-        .whereInComposite(["type", "user_id", "code"], deletes);
-    }
     // Render
     res.render(view, this.confirmViewParams(title, message));
+  }
+  /**
+   * Utils: construct params passed to views/password.ejs
+   */
+  passwordViewParams(req, title, message, errors = {}) {
+    return {
+      errors: errors,
+      fields: ["password", "confirm_password"],
+      title: title,
+      message: message,
+      password: getField(req, "password"),
+      confirm_password: getField(req, "confirm_password")
+    };
+  }
+  /**
+   * GET security/password/:id/:code
+   */
+  async actionPasswordGet(req, res) {
+    res.render("security/password", this.passwordViewParams(req, {}));
+  }
+  /**
+   * POST security/password
+   */
+  async actionPasswordPost(req, res) {
+    // Check validation errors
+    const errors = validationErrors(req);
+    if (!errors.isEmpty()) {
+      return res.render(
+        "security/password",
+        this.passwordViewParams(req, "404", "Bad Request", errors.mapped())
+      );
+    }
+    // Check confirm password matches password
+    const password = getField(req, "password");
+    const confirm_password = getField(req, "confirm_password");
+    if (confirm_password !== password) {
+      return res.render(
+        "security/password",
+        this.passwordViewParams(req, "404", "Bad Request", {
+          confirm_password: {
+            message: "Confirm password doesn't match password."
+          }
+        })
+      );
+    }
+    // Load token
+    const token = await this.loadToken(req, Token.TYPE_RECOVERY);
+    // Not found
+    if (!token) {
+      return res.render(
+        "security/error",
+        this.passwordViewParams(
+          req,
+          "Change password Failed",
+          "Token Not Found"
+        )
+      );
+    }
+    // Parse token
+    const { username, user, notExpired } = await this.parseToken(token);
+    // Token not expired
+    let view = "security/success";
+    let title = "Password Changed";
+    let message = "Thank you " + username + ", your password has been changed";
+    if (notExpired) {
+      // Change password
+      await user.$query().patch({
+        password: getField(req, "password")
+      });
+    }
+    // Token expired
+    else {
+      view = "security/error";
+      title = "Change Password Failed";
+      message = " Token has expired";
+    }
+    // Render
+    res.render(view, this.passwordViewParams(req, title, message));
   }
   /**
    * Utils: construct params passed to views/resend.ejs
@@ -439,89 +536,5 @@ module.exports = class SecurityController extends BassController {
       title: "Email Sent",
       message: "A recovery email has been sent to " + email
     });
-  }
-  /**
-   * Utils: construct params passed to views/password.ejs
-   */
-  passwordViewParams(req, errors = {}) {
-    return {
-      errors: errors,
-      fields: ["password"],
-      password: getField(req, "password")
-    };
-  }
-  /**
-   * GET security/password/:id/:code
-   */
-  async actionPasswordGet(req, res) {
-    res.render("security/password", this.passwordViewParams(req, {}));
-  }
-  /**
-   * POST security/password
-   */
-  async actionPasswordPost(req, res) {
-    // Check validation errors
-    const errors = validationErrors(req);
-    if (!errors.isEmpty()) {
-      return res.render(
-        "security/error",
-        this.confirmViewParams("404", "Bad Request", errors.mapped())
-      );
-    }
-    // Load token(s)
-    const id = getParam(req, "id");
-    const code = getParam(req, "code");
-    const tokens = await Token.query().where({
-      user_id: id,
-      type: Token.TYPE_RECOVERY,
-      code: code
-    });
-    // Not found
-    if (!tokens || tokens.length === 0) {
-      return res.render(
-        "security/error",
-        this.confirmViewParams("Recover password Failed", "Token Not Found")
-      );
-    }
-    // Parse token(s)
-    let user;
-    let username;
-    let notExpired = true;
-    let deletes = [];
-    for (let i = 0; i < tokens.length; i++) {
-      const token = tokens[i];
-      if (!user) {
-        user = await token.$relatedQuery("user");
-        username = user.username;
-      }
-      if (token.expired()) {
-        notExpired = false;
-      }
-      deletes.push([token.type, token.user_id, token.code]);
-    }
-    // Token(s) not expired
-    let view = "security/success";
-    let title = "Password Changed";
-    let message = "Thank you " + username + ", your password has been changed";
-    if (notExpired) {
-      // Confirmed at timestamp
-      await user.$query().patch({
-        password: getField(req, "password")
-      });
-    }
-    // Token(s) expired
-    else {
-      view = "security/error";
-      title = "Change Password Failed";
-      message = " Token has expired";
-    }
-    // Delete token(s)
-    if (deletes) {
-      await Token.query()
-        .delete()
-        .whereInComposite(["type", "user_id", "code"], deletes);
-    }
-    // Render
-    res.render(view, this.confirmViewParams(title, message));
   }
 };
