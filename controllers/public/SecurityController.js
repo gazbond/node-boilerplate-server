@@ -33,8 +33,10 @@ module.exports = class SecurityController extends BassController {
     super();
     // Paths:
     this.paths.login = "/security/login";
-    this.paths.confirm = "/security/confirm/:id";
+    this.paths.confirm = "/security/confirm/:id/:code";
     this.paths.resend = "/security/resend";
+    this.paths.recover = "/security/recover";
+    this.paths.password = "/security/password/:id/:code";
     // Validations:
     this.validators.login = [
       check("login", "Invalid Login, should be alpha-numeric.")
@@ -74,6 +76,38 @@ module.exports = class SecurityController extends BassController {
           checkFalsy: true
         })
         .isEmail()
+        .isLength({ min: 3 })
+    ];
+    this.validators.recover = [
+      check("email", "Invalid email address.")
+        .exists({
+          checkNull: true,
+          checkFalsy: true
+        })
+        .isEmail()
+        .isLength({ min: 3 })
+    ];
+    this.validators.password = [
+      check("password", "Invalid Password, should be alpha-numeric.")
+        .exists({
+          checkNull: true,
+          checkFalsy: true
+        })
+        .isAlphanumeric()
+        .isLength({ min: 4 }),
+      check("id", "Param 'id' should be an integer.")
+        .exists({
+          checkNull: true,
+          checkFalsy: true
+        })
+        .isInt(),
+      check("code", "Param 'code' should be a string and 32 characters long.")
+        .exists({
+          checkNull: true,
+          checkFalsy: true
+        })
+        .isString()
+        .isLength({ min: 32, max: 32 })
     ];
     // Cores:
     this.cors = {
@@ -87,7 +121,11 @@ module.exports = class SecurityController extends BassController {
       "actionLoginPost",
       "actionConfirmGet",
       "actionResendGet",
-      "actionResendPost"
+      "actionResendPost",
+      "actionRecoverGet",
+      "actionRecoverPost",
+      "actionPasswordGet",
+      "actionPasswordPost"
     ]);
   }
   /**
@@ -116,6 +154,18 @@ module.exports = class SecurityController extends BassController {
       this.paths.resend,
       this.validators.resend,
       wrapAsync(this.actionResendPost)
+    );
+    this.router.get(this.paths.recover, wrapAsync(this.actionRecoverGet));
+    this.router.post(
+      this.paths.recover,
+      this.validators.recover,
+      wrapAsync(this.actionRecoverPost)
+    );
+    this.router.get(this.paths.password, wrapAsync(this.actionPasswordGet));
+    this.router.post(
+      this.paths.password,
+      this.validators.password,
+      wrapAsync(this.actionPasswordPost)
     );
     return this.router;
   }
@@ -223,7 +273,7 @@ module.exports = class SecurityController extends BassController {
     };
   }
   /**
-   * GET security/confirm/:id?code=
+   * GET security/confirm/:id/:code
    */
   async actionConfirmGet(req, res) {
     // Check validation errors
@@ -304,7 +354,7 @@ module.exports = class SecurityController extends BassController {
    * GET security/resend
    */
   async actionResendGet(req, res) {
-    res.render("security/resend", this.resendViewParams(req));
+    res.render("security/resend", this.resendViewParams(req, {}));
   }
   /**
    * POST security/resend
@@ -333,11 +383,145 @@ module.exports = class SecurityController extends BassController {
       );
     }
     // Send confirmation
-    await user.sendEmailConfirmation();
+    await user.sendConfirmationEmail();
     // Render
     res.render("security/success", {
       title: "Email Sent",
       message: "A confirmation email has been sent to " + email
     });
+  }
+  /**
+   * Utils: construct params passed to views/recover.ejs
+   */
+  recoverViewParams(req, errors = {}) {
+    return {
+      errors: errors,
+      fields: ["email"],
+      email: getField(req, "email")
+    };
+  }
+  /**
+   * GET security/recover
+   */
+  async actionRecoverGet(req, res) {
+    res.render("security/recover", this.recoverViewParams(req, {}));
+  }
+  /**
+   * POST security/recover
+   */
+  async actionRecoverPost(req, res) {
+    // Check validation errors
+    const errors = validationErrors(req);
+    if (!errors.isEmpty()) {
+      return res.render(
+        "security/recover",
+        this.recoverViewParams(req, errors.mapped())
+      );
+    }
+    // Try loading user
+    const email = getField(req, "email");
+    const user = await User.query()
+      .where({ email: email })
+      .first();
+    // User not found
+    if (!user) {
+      return res.render(
+        "security/recover",
+        this.resendViewParams(req, {
+          email: { message: "Email not found." }
+        })
+      );
+    }
+    // Send recovery
+    await user.sendRecoveryEmail();
+    // Render
+    res.render("security/success", {
+      title: "Email Sent",
+      message: "A recovery email has been sent to " + email
+    });
+  }
+  /**
+   * Utils: construct params passed to views/password.ejs
+   */
+  passwordViewParams(req, errors = {}) {
+    return {
+      errors: errors,
+      fields: ["password"],
+      password: getField(req, "password")
+    };
+  }
+  /**
+   * GET security/password/:id/:code
+   */
+  async actionPasswordGet(req, res) {
+    res.render("security/password", this.passwordViewParams(req, {}));
+  }
+  /**
+   * POST security/password
+   */
+  async actionPasswordPost(req, res) {
+    // Check validation errors
+    const errors = validationErrors(req);
+    if (!errors.isEmpty()) {
+      return res.render(
+        "security/error",
+        this.confirmViewParams("404", "Bad Request", errors.mapped())
+      );
+    }
+    // Load token(s)
+    const id = getParam(req, "id");
+    const code = getParam(req, "code");
+    const tokens = await Token.query().where({
+      user_id: id,
+      type: Token.TYPE_RECOVERY,
+      code: code
+    });
+    // Not found
+    if (!tokens || tokens.length === 0) {
+      return res.render(
+        "security/error",
+        this.confirmViewParams("Recover password Failed", "Token Not Found")
+      );
+    }
+    // Parse token(s)
+    let user;
+    let username;
+    let notExpired = true;
+    let deletes = [];
+    for (let i = 0; i < tokens.length; i++) {
+      const token = tokens[i];
+      if (!user) {
+        user = await token.$relatedQuery("user");
+        username = user.username;
+      }
+      if (token.expired()) {
+        notExpired = false;
+      }
+      deletes.push([token.type, token.user_id, token.code]);
+    }
+    // Token(s) not expired
+    let view = "security/success";
+    let title = "Password Changed";
+    let message = "Thank you " + username + ", your password has been changed";
+    if (notExpired) {
+      // Confirmed at timestamp
+      await user.$query().patch({
+        password: getField(req, "password")
+      });
+    }
+    // Token(s) expired
+    else {
+      view = "security/error";
+      title = "Change Password Failed";
+      message = " Token has expired";
+    }
+    // Delete token(s)
+    if (deletes) {
+      await Token.query()
+        .delete()
+        .whereInComposite(["type", "user_id", "code"], deletes);
+    }
+    // Render
+    res.render(view, this.confirmViewParams(title, message));
   }
 };
