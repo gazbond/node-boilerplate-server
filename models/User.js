@@ -133,17 +133,35 @@ module.exports = class User extends BaseClass {
   /**
    * Create token and email confirm link.
    */
-  async sendEmailConfirmation() {
+  async sendConfirmationEmail() {
     // Create token
-    const token = await Token.query().insert({
+    const token = await Token.query().insertAndFetch({
       type: Token.TYPE_CONFIRMATION,
       user_id: this.id
     });
     // Send confirmation email
-    await sendEmail(this.email, "register", {
+    await sendEmail(this.email, "confirmation", {
       name: name,
       username: this.username,
-      url: `http://localhost:8080/security/confirm/${token.user_id}?code=${
+      url: `http://localhost:8080/security/confirm/${token.user_id}/${
+        token.code
+      }`
+    });
+  }
+  /**
+   * Create token and email password recovery link.
+   */
+  async sendRecoveryEmail() {
+    // Create token
+    const token = await Token.query().insertAndFetch({
+      type: Token.TYPE_RECOVERY,
+      user_id: this.id
+    });
+    // Send confirmation email
+    await sendEmail(this.email, "recovery", {
+      name: name,
+      username: this.username,
+      url: `http://localhost:8080/security/password/${token.user_id}/${
         token.code
       }`
     });
@@ -167,7 +185,7 @@ module.exports = class User extends BaseClass {
       await this.assignRoles(roles);
     }
     if (emailConfirmation) {
-      await this.sendEmailConfirmation();
+      await this.sendConfirmationEmail();
     }
   }
   /**
