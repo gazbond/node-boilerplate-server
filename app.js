@@ -13,6 +13,13 @@ const { ValidationError } = require("objection");
 
 /**
  * ------------------------------------------------------
+ * Config.
+ * ------------------------------------------------------
+ */
+const config = require("./config");
+
+/**
+ * ------------------------------------------------------
  * Public router.
  * ------------------------------------------------------
  */
@@ -32,7 +39,7 @@ routerPublic.use(
  */
 routerPublic.use(favicon("library/static/favicon.ico"));
 routerPublic.get("/", (req, res) => {
-  res.render("home");
+  res.render("home", { name: config.name });
 });
 /**
  * Public security controller.
