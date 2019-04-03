@@ -1,6 +1,8 @@
 const bodyParser = require("body-parser");
+const cookieParser = require("cookie-parser");
 const cors = require("cors");
 const jwt = require("jsonwebtoken");
+const csrf = require("csurf");
 const { buildCheckFunction } = require("express-validator/check");
 const check = buildCheckFunction(["params", "body", "query"]);
 const BassController = require("../../library/BaseController");
@@ -22,8 +24,7 @@ const {
 } = require("../../library/helpers/utils");
 
 /**
- * Security controller handles login, confirm email and change password.
- * TODO: redirectUrl query param (no json response?)
+ * Security controller handles login, confirm email and recover password.
  */
 module.exports = class SecurityController extends BassController {
   /**
@@ -52,7 +53,10 @@ module.exports = class SecurityController extends BassController {
           checkFalsy: true
         })
         .isAlphanumeric()
-        .isLength({ min: 4 })
+        .isLength({ min: 4 }),
+      check("redirectUrl", "Param 'redirectUrl' should be a url.")
+        .optional()
+        .isLength({ min: 1 })
     ];
     this.validators.confirm = [
       check("id", "Param 'id' should be an integer.")
@@ -125,6 +129,8 @@ module.exports = class SecurityController extends BassController {
       allowedHeaders: ["Content-Type"],
       exposedHeaders: ["Authorization"]
     };
+    // CSRF:
+    this.csrf = [csrf({ cookie: true })];
     // To get 'this' in instance methods:
     bindMethods(this, [
       "actionLoginGet",
@@ -142,6 +148,7 @@ module.exports = class SecurityController extends BassController {
    * Returns express.Router() configured with paths/middleware.
    */
   initRouter() {
+    this.router.use(cookieParser());
     this.router.use(this.paths.login, cors(this.cors));
     this.router.use(
       this.paths.login,
@@ -159,22 +166,34 @@ module.exports = class SecurityController extends BassController {
       this.validators.confirm,
       wrapAsync(this.actionConfirmGet)
     );
-    this.router.get(this.paths.resend, wrapAsync(this.actionResendGet));
+    this.router.get(
+      this.paths.resend,
+      this.csrf,
+      wrapAsync(this.actionResendGet)
+    );
     this.router.post(
       this.paths.resend,
-      this.validators.resend,
+      this.validators.resend.concat(this.csrf),
       wrapAsync(this.actionResendPost)
     );
-    this.router.get(this.paths.recover, wrapAsync(this.actionRecoverGet));
+    this.router.get(
+      this.paths.recover,
+      this.csrf,
+      wrapAsync(this.actionRecoverGet)
+    );
     this.router.post(
       this.paths.recover,
-      this.validators.recover,
+      this.validators.recover.concat(this.csrf),
       wrapAsync(this.actionRecoverPost)
     );
-    this.router.get(this.paths.password, wrapAsync(this.actionPasswordGet));
+    this.router.get(
+      this.paths.password,
+      this.csrf,
+      wrapAsync(this.actionPasswordGet)
+    );
     this.router.post(
       this.paths.password,
-      this.validators.password,
+      this.validators.password.concat(this.csrf),
       wrapAsync(this.actionPasswordPost)
     );
     return this.router;
@@ -200,14 +219,26 @@ module.exports = class SecurityController extends BassController {
    * POST security/login
    */
   async actionLoginPost(req, res) {
+    // Content type
+    let isJsonContentType = false;
+    if (req.headers["content-type"] === "application/json") {
+      isJsonContentType = true;
+    }
     // Check validation errors
     const errors = validationErrors(req);
     if (!errors.isEmpty()) {
-      // mapped() means only 1 error per field. Specify fields[] in partials/errors.ejs
-      return res.render(
-        "security/login",
-        this.loginViewParams(req, errors.mapped())
-      );
+      // mapped() means field name as object property. Specify fields[] in partials/errors.ejs
+      if (isJsonContentType) {
+        // 400 Bad Request
+        return res.status(400).send({
+          errors: errors.mapped()
+        });
+      } else {
+        return res.render(
+          "security/login",
+          this.loginViewParams(req, errors.mapped())
+        );
+      }
     }
     // Try loading user
     const login = getField(req, "login");
@@ -217,32 +248,53 @@ module.exports = class SecurityController extends BassController {
       .first();
     // User not found
     if (!user) {
-      return res.render(
-        "security/login",
-        this.loginViewParams(req, {
-          login: { message: "Incorrect login." }
-        })
-      );
-    }
-    // Requires confirmation
-    if (emailConfirmation && !user.confirmed_at) {
-      return res.render(
-        "security/login",
-        this.loginViewParams(req, {
-          login: { message: "Email confirmation required." }
-        })
-      );
+      if (isJsonContentType) {
+        // 404 Not Found
+        return res.status(404).send({
+          errors: { login: { message: "Incorrect login." } }
+        });
+      } else {
+        return res.render(
+          "security/login",
+          this.loginViewParams(req, {
+            login: { message: "Incorrect login." }
+          })
+        );
+      }
     }
     // Incorrect password
     const password = getField(req, "password");
     const validPassword = await user.verifyPassword(password);
     if (!validPassword) {
-      return res.render(
-        "security/login",
-        this.loginViewParams(req, {
-          password: { message: "Incorrect password." }
-        })
-      );
+      if (isJsonContentType) {
+        // 404 Not Found
+        return res.status(404).send({
+          errors: { password: { message: "Incorrect password." } }
+        });
+      } else {
+        return res.render(
+          "security/login",
+          this.loginViewParams(req, {
+            password: { message: "Incorrect password." }
+          })
+        );
+      }
+    }
+    // Requires confirmation
+    if (emailConfirmation && !user.confirmed_at) {
+      if (isJsonContentType) {
+        // 400 Bad Request
+        return res.status(400).send({
+          errors: { login: { message: "Email confirmation required." } }
+        });
+      } else {
+        return res.render(
+          "security/login",
+          this.loginViewParams(req, {
+            login: { message: "Email confirmation required." }
+          })
+        );
+      }
     }
     // Generate token
     const payload = { id: user.id };
@@ -262,15 +314,20 @@ module.exports = class SecurityController extends BassController {
           httpOnly: true,
           sameSite: true
         });
-        // Send Token
-        res.json({
-          Authorization: token
-        });
+        if (isJsonContentType) {
+          // 200 OK
+          return res.status(200).send({
+            Authorization: token
+          });
+        }
+        // Redirect
+        const redirectUrl = getParam(req, "redirectUrl", "/");
+        return res.redirect(redirectUrl);
       }
     );
   }
   /**
-   * Load token.
+   * Load token (uses by confirm/password actions)
    */
   async loadToken(req, type) {
     const id = getParam(req, "id");
@@ -285,7 +342,7 @@ module.exports = class SecurityController extends BassController {
     return token;
   }
   /**
-   * Parse token.
+   * Parse token (uses by confirm/password actions)
    *
    * @param {Token} token
    */
@@ -364,6 +421,7 @@ module.exports = class SecurityController extends BassController {
    */
   passwordViewParams(req, title, message, errors = {}) {
     return {
+      csrf: req.csrfToken(),
       errors: errors,
       fields: ["password", "confirm_password"],
       title: title,
@@ -442,6 +500,7 @@ module.exports = class SecurityController extends BassController {
    */
   resendViewParams(req, errors = {}) {
     return {
+      csrf: req.csrfToken(),
       errors: errors,
       fields: ["email"],
       email: getField(req, "email")
@@ -492,6 +551,7 @@ module.exports = class SecurityController extends BassController {
    */
   recoverViewParams(req, errors = {}) {
     return {
+      csrf: req.csrfToken(),
       errors: errors,
       fields: ["email"],
       email: getField(req, "email")
