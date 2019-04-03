@@ -1,17 +1,19 @@
 const Email = require("email-templates");
 const nodemailer = require("nodemailer");
+const path = require("path");
+const fs = require("fs");
 
 /**
  * ------------------------------------------------------
  * Config.
  * ------------------------------------------------------
  */
-const config = require("../../config");
+const { email } = require("../../config");
 
 /**
- * Nodemailer transport
+ * Using nodemailer.
  */
-const transport = nodemailer.createTransport(config.email.transport);
+const transport = nodemailer.createTransport(email.transport);
 
 /**
  * Using email-templates.
@@ -22,10 +24,10 @@ const transport = nodemailer.createTransport(config.email.transport);
  *        text.ejs
  *        html.ejs
  */
-const email = new Email({
+const emailTemplate = new Email({
   send: true,
   message: {
-    from: config.email.from
+    from: email.from
   },
   transport: transport,
   views: {
@@ -42,14 +44,26 @@ const email = new Email({
  * @param {string} template
  * @param {{}} locals
  */
-const sendEmail = (toAddress, template, locals) => {
-  return email.send({
+const sendEmail = async (toAddress, template, locals) => {
+  const response = await emailTemplate.send({
     template: template,
     message: {
       to: toAddress
     },
     locals: locals
   });
+  // Write email to file
+  if (email.transport.jsonTransport) {
+    const basePath = path.resolve(__dirname, "../../tests/_output/emails/");
+    const outputPath = [basePath, "/", template, "/"].join("");
+    const outputFile = [outputPath, toAddress, ".json"].join("");
+    console.log("jsonTransport: ", outputFile);
+    const output = JSON.stringify(response.originalMessage);
+    // Create output directories
+    await fs.mkdirSync(outputPath, { recursive: true });
+    // Write file
+    await fs.writeFileSync(outputFile, output, "utf8");
+  }
 };
 
-module.exports = { transport, sendEmail };
+module.exports = { sendEmail };

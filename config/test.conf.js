@@ -19,6 +19,7 @@ module.exports = {
   email: {
     from: "no-reply@node-boilerplate-server.com",
     transport: {
+      // Writes to file: tests/_output/emails/ instead of sending
       jsonTransport: true
     }
   },
