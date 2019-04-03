@@ -42,7 +42,15 @@ module.exports = class User extends BaseClass {
     return ["username", "email", "password"];
   }
   static get visible() {
-    return ["id", "username", "email", "auth_key", "created_at", "updated_at"];
+    return [
+      "id",
+      "username",
+      "email",
+      "roles",
+      "created_at",
+      "confirmed_at",
+      "updated_at"
+    ];
   }
   static get relationMappings() {
     return {

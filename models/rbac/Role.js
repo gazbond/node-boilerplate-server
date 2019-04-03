@@ -1,6 +1,7 @@
 const { Model } = require("objection");
 const { DbErrors } = require("objection-db-errors");
-const BaseClass = DbErrors(Model);
+const VisibilityPlugin = require("objection-visibility").default;
+const BaseClass = DbErrors(VisibilityPlugin(Model));
 
 const Permission = require("./Permission");
 const PermissionAssignment = require("./PermissionAssignment");
@@ -20,6 +21,9 @@ module.exports = class Role extends BaseClass {
         name: { type: "string", minLength: 1, maxLength: 64 }
       }
     };
+  }
+  static get visible() {
+    return ["name", "permissions"];
   }
   static get relationMappings() {
     return {
