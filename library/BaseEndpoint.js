@@ -73,6 +73,8 @@ module.exports = class BassEndpoint {
       update: [],
       delete: []
     };
+    // Eager load models:
+    this.eager = "";
     // Get 'this' in instance methods:
     bindMethods(this, [
       "initRouter",
@@ -134,7 +136,9 @@ module.exports = class BassEndpoint {
     // Indexed from 0
     const page = currentPage > 0 ? currentPage - 1 : 0;
     // Query
-    const response = await this.Model.query().page(page, perPage);
+    const response = await this.Model.query()
+      .eager(this.eager)
+      .page(page, perPage);
     // Response
     const total = response.total;
     const pageCount = Math.ceil(total / perPage);
@@ -164,7 +168,9 @@ module.exports = class BassEndpoint {
       });
     }
     const id = getParam(req, "id");
-    const model = await this.Model.query().findById(id);
+    const model = await this.Model.query()
+      .eager(this.eager)
+      .findById(id);
     if (!model) {
       // 404 Not Found
       return res.status(404).end();
