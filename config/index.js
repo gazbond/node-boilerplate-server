@@ -4,7 +4,8 @@
  * ------------------------------------------------------
  */
 const chalk = require("chalk").default;
-const environment = process.env.ENVIRONMENT || "development";
+const environment = process.env.NODE_ENV || "development";
+console.log(chalk.yellow("environment:"), chalk.green(environment));
 let configPath = "./dev.conf";
 if (environment === "testing") {
   configPath = "./test.conf";
