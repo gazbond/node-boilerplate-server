@@ -26,6 +26,7 @@ const transport = nodemailer.createTransport(email.transport);
  */
 const emailTemplate = new Email({
   send: true,
+  preview: false,
   message: {
     from: email.from
   },
@@ -54,16 +55,22 @@ const sendEmail = async (toAddress, template, locals) => {
   });
   // Write email to file
   if (email.transport.jsonTransport) {
+    // Paths
     const basePath = path.resolve(__dirname, "../../tests/_output/emails/");
     const outputPath = [basePath, "/", template, "/"].join("");
     const outputFile = [outputPath, toAddress, ".json"].join("");
-    console.log("jsonTransport: ", outputFile);
-    const output = JSON.stringify(response.originalMessage);
     // Create output directories
-    await fs.mkdirSync(outputPath, { recursive: true });
+    if (!fs.existsSync(outputFile)) {
+      fs.mkdirSync(outputPath, { recursive: true });
+    }
+    // Remove if exists
+    if (fs.existsSync(outputFile)) {
+      fs.unlinkSync(outputFile);
+    }
     // Write file
-    await fs.writeFileSync(outputFile, output, "utf8");
+    const output = JSON.stringify(response.originalMessage);
+    fs.writeFileSync(outputFile, output, "utf8");
   }
 };
 
-module.exports = { sendEmail };
+module.exports = { transport, sendEmail };
