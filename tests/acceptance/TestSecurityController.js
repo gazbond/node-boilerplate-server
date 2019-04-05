@@ -1,4 +1,14 @@
 /// <reference path="../../library/typings/steps.d.ts" />
+const { knex } = require("../../config");
+
+BeforeSuite(async () => {
+  await knex.migrate.latest();
+});
+Before(async () => {
+  await knex.seed.run({
+    directory: "./seeds/test"
+  });
+});
 
 Feature("Test SecurityController");
 
@@ -7,8 +17,8 @@ Scenario("test submitting empty login form", I => {
   I.fillField("login", "");
   I.fillField("password", "");
   I.click("Login");
-  I.see("Login should be alpha-numeric and more than 3 characters long");
-  I.see("Password should be alpha-numeric and more than 4 characters long");
+  I.see("Invalid Login, should be alpha-numeric.");
+  I.see("Invalid Password, should be alpha-numeric.");
 });
 
 Scenario("test submitting wrong login form details", I => {
@@ -30,4 +40,12 @@ Scenario("test submitting correct login form details", I => {
   I.fillField("password", "password");
   I.click("Login");
   I.seeCookie("Authorization");
+});
+
+/**
+ * Destroy knex instance so that codecept process exists.
+ * Must be last to prevent codecept bug.
+ */
+AfterSuite(async () => {
+  await knex.destroy();
 });
