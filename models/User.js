@@ -10,6 +10,7 @@ const BaseClass = Password(Unique(BaseModel));
 const crypto = require("crypto-promise");
 const {
   name,
+  baseUrl,
   models: {
     user: { emailConfirmation, roles }
   }
@@ -151,9 +152,7 @@ module.exports = class User extends BaseClass {
     await sendEmail(this.email, "confirmation", {
       name: name,
       username: this.username,
-      url: `http://localhost:8080/security/confirm/${token.user_id}/${
-        token.code
-      }`
+      url: `${baseUrl}/security/confirm/${token.user_id}/${token.code}`
     });
   }
   /**
@@ -169,9 +168,7 @@ module.exports = class User extends BaseClass {
     await sendEmail(this.email, "recovery", {
       name: name,
       username: this.username,
-      url: `http://localhost:8080/security/password/${token.user_id}/${
-        token.code
-      }`
+      url: `${baseUrl}/security/password/${token.user_id}/${token.code}`
     });
   }
   /**
