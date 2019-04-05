@@ -1,5 +1,3 @@
-process.env.ENVIRONMENT = "testing";
-
 const expect = require("expect.js");
 
 const { knex } = require("../../config");

@@ -1,12 +1,10 @@
-process.env.ENVIRONMENT = "testing";
-
 const expect = require("expect.js");
 const chai = require("chai");
 const chaiHttp = require("chai-http");
 chai.use(chaiHttp);
 
 const { knex } = require("../../config");
-const app = require("../../app");
+const server = "http://nodetest:7070";
 
 let token;
 before(async function() {
@@ -16,9 +14,9 @@ before(async function() {
   });
   // Login form returns { Authorization: <token> }
   const login = await chai
-    .request(app)
+    .request(server)
     .post("/security/login")
-    .set("Content-Type", "application/x-www-form-urlencoded")
+    .set("Content-Type", "application/json")
     .send({
       login: "root",
       password: "password"
@@ -32,7 +30,7 @@ after(async function() {
 describe("Test UserEndpoint", function() {
   it("test UserEndpoint index and view actions", async function() {
     const response = await chai
-      .request(app)
+      .request(server)
       .get("/api/users")
       .set("Authorization", `Bearer ${token}`);
     expect(response.status).to.equal(200);
@@ -40,7 +38,7 @@ describe("Test UserEndpoint", function() {
     response.body.forEach(async user => {
       const id = user.id;
       const current = await chai
-        .request(app)
+        .request(server)
         .get(`/api/users/${id}`)
         .set("Authorization", `Bearer ${token}`);
       expect(current.status).to.equal(200);
@@ -50,7 +48,7 @@ describe("Test UserEndpoint", function() {
   let id;
   it("test UserEndpoint create action", async function() {
     const response = await chai
-      .request(app)
+      .request(server)
       .post("/api/users")
       .set("Authorization", `Bearer ${token}`)
       .send({
@@ -65,7 +63,7 @@ describe("Test UserEndpoint", function() {
   });
   it("test UserEndpoint update action", async function() {
     const response = await chai
-      .request(app)
+      .request(server)
       .put(`/api/users/${id}`)
       .set("Authorization", `Bearer ${token}`)
       .send({
@@ -77,29 +75,29 @@ describe("Test UserEndpoint", function() {
   });
   it("test UserEndpoint delete action", async function() {
     let response = await chai
-      .request(app)
+      .request(server)
       .delete(`/api/users/${id}`)
       .set("Authorization", `Bearer ${token}`);
     expect(response.status).to.equal(200);
     response = await chai
-      .request(app)
+      .request(server)
       .get(`/api/users/${id}`)
       .set("Authorization", `Bearer ${token}`);
     expect(response.status).to.equal(404);
   });
   it("test UserEndpoint actions with non existant ids", async function() {
     let response = await chai
-      .request(app)
+      .request(server)
       .get(`/api/users/${id}`)
       .set("Authorization", `Bearer ${token}`);
     expect(response.status).to.equal(404);
     response = await chai
-      .request(app)
+      .request(server)
       .put(`/api/users/${id}`)
       .set("Authorization", `Bearer ${token}`);
     expect(response.status).to.equal(404);
     response = await chai
-      .request(app)
+      .request(server)
       .delete(`/api/users/${id}`)
       .set("Authorization", `Bearer ${token}`);
     expect(response.status).to.equal(404);
