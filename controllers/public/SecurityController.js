@@ -342,7 +342,7 @@ module.exports = class SecurityController extends BassController {
     return token;
   }
   /**
-   * Parse token (uses by confirm/password actions)
+   * Parse token (used by confirm/password actions)
    *
    * @param {Token} token
    */
@@ -353,13 +353,19 @@ module.exports = class SecurityController extends BassController {
     const user = await token.$relatedQuery("user");
     const username = user.username;
     const notExpired = !token.expired();
-    // Delete token
-    await Token.query().deleteById([token.type, token.user_id, token.code]);
     return {
       user,
       username,
       notExpired
     };
+  }
+  /**
+   * Delete token (used by confirm/password actions)
+   *
+   * @param {Token} token
+   */
+  async deleteToken(token) {
+    await Token.query().deleteById([token.type, token.user_id, token.code]);
   }
   /**
    * Utils: construct params passed to:
@@ -413,6 +419,7 @@ module.exports = class SecurityController extends BassController {
       title = "Confirmation Failed";
       message = " Token has expired";
     }
+    await this.deleteToken(token);
     // Render
     res.render(view, this.confirmViewParams(title, message));
   }
@@ -437,7 +444,7 @@ module.exports = class SecurityController extends BassController {
     res.render("security/password", this.passwordViewParams(req, {}));
   }
   /**
-   * POST security/password
+   * POST security/password/:id/:code
    */
   async actionPasswordPost(req, res) {
     // Check validation errors
@@ -492,6 +499,7 @@ module.exports = class SecurityController extends BassController {
       title = "Change Password Failed";
       message = " Token has expired";
     }
+    await this.deleteToken(token);
     // Render
     res.render(view, this.passwordViewParams(req, title, message));
   }
