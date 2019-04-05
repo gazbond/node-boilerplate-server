@@ -4,7 +4,7 @@ exports.config = {
   helpers: {
     WebDriver: {
       host: "chrome",
-      url: "http://node:8080",
+      url: "http://nodetest:7070",
       keepCookies: true,
       browser: "chrome"
     }

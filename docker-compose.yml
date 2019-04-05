@@ -3,12 +3,12 @@ services:
     node:
         image: node:11.10.0
         working_dir: /app
-        # Use 'npm run start:docker' to fix npm problems
         command: npm run start:debug
         volumes:
             - ./:/app:delegated
         environment:
             - NODE_ENV=development
+            - PORT=8080
             - TERM=xterm-256color
         tty: true
         depends_on:
@@ -16,6 +16,19 @@ services:
         ports: 
             - 8080:8080
             - 9229:9229
+    nodetest:
+        image: node:11.10.0
+        working_dir: /app
+        command: npm run start:test
+        volumes:
+            - ./:/app:delegated
+        environment:
+            - NODE_ENV=testing
+            - PORT=7070
+            - TERM=xterm-256color
+        tty: true
+        depends_on:
+            - postgres
     postgres:
         image: postgres:11.1
         restart: always

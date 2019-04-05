@@ -15,8 +15,8 @@
     "test:api": "mocha --timeout 15000 --recursive tests/api/**/*.js",
     "test:cept": "codeceptjs run --steps",
     "start": "node server.js",
-    "start:debug": "nodemon --inspect=0.0.0.0 server.js",
-    "start:docker": "npm install --quiet && npm run start:debug"
+    "start:debug": "npm install --quiet && nodemon --inspect=0.0.0.0 server.js",
+    "start:test": "npm install --quiet && nodemon server.js"
   },
   "dependencies": {
     "ajv": "^6.10.0",
