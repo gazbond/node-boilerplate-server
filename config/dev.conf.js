@@ -11,6 +11,7 @@ Model.knex(knex);
 
 module.exports = {
   name: "Node boilerplate server",
+  baseUrl: "http://localhost:8080",
   knex: knex,
   jwt: {
     secretOrKey: "md6a-gbs89le72ha8we7js-zo-awns67uw",
@@ -19,13 +20,15 @@ module.exports = {
   email: {
     from: "no-reply@node-boilerplate-server.com",
     transport: {
-      pool: true,
-      secure: true,
-      service: "Gmail",
-      auth: {
-        user: "",
-        pass: ""
-      }
+      // pool: true,
+      // secure: true,
+      // service: "Gmail",
+      // auth: {
+      //   user: "",
+      //   pass: ""
+      // }
+      // Writes to file: tests/_output/emails/ instead of sending
+      jsonTransport: true
     }
   },
   models: {

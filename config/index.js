@@ -18,9 +18,10 @@ const Ajv = require("ajv");
 const ajv = new Ajv(); // options can be passed, e.g. {allErrors: true}
 const validate = ajv.compile({
   type: "object",
-  required: ["name", "knex", "jwt", "models"],
+  required: ["name", "baseUrl", "knex", "jwt", "models"],
   properties: {
     name: { type: "string" },
+    baseUrl: { type: "string", format: "uri" },
     jwt: {
       type: "object",
       required: ["secretOrKey", "expiresIn"],

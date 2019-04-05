@@ -11,6 +11,7 @@ Model.knex(knex);
 
 module.exports = {
   name: "Node boilerplate server",
+  baseUrl: "http://nodetest:7070",
   knex: knex,
   jwt: {
     secretOrKey: "md6a-gbs89le72ha8we7js-zo-awns67uw",
