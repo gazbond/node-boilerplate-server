@@ -57,8 +57,8 @@ const sendEmail = async (toAddress, template, locals) => {
   if (email.transport.jsonTransport) {
     // Paths
     const basePath = path.resolve(__dirname, "../../tests/_output/emails/");
-    const outputPath = [basePath, "/", template, "/"].join("");
-    const outputFile = [outputPath, toAddress, ".json"].join("");
+    const outputPath = `${basePath}/${template}/`;
+    const outputFile = `${outputPath}${toAddress}.json`;
     // Create output directories
     if (!fs.existsSync(outputFile)) {
       fs.mkdirSync(outputPath, { recursive: true });
