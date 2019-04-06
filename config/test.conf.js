@@ -10,7 +10,7 @@ const { Model } = require("objection");
 Model.knex(knex);
 
 module.exports = {
-  name: "Node boilerplate server",
+  name: "Node boilerplate test server",
   baseUrl: "http://nodetest:7070",
   knex: knex,
   jwt: {
