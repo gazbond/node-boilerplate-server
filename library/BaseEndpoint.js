@@ -31,7 +31,7 @@ module.exports = class BassEndpoint {
     // Paths:
     this.path = path;
     this.pathWithParam = path + param;
-    // Cores:
+    // CORS:
     this.cors = {
       methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
       allowedHeaders: ["Content-Type", "Authorization"],

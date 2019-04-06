@@ -61,7 +61,7 @@ module.exports = class Token extends BaseClass {
     return now > expiresAt;
   }
   /**
-   * Generate auth key.
+   * Generate code.
    */
   async $beforeInsert(queryContext) {
     await super.$beforeInsert(queryContext);

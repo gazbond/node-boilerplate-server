@@ -123,7 +123,7 @@ module.exports = class SecurityController extends BassController {
         .isString()
         .isLength({ min: 32, max: 32 })
     ];
-    // Cores:
+    // CORS:
     this.cors = {
       methods: ["GET", "POST"],
       allowedHeaders: ["Content-Type"],
@@ -199,7 +199,8 @@ module.exports = class SecurityController extends BassController {
     return this.router;
   }
   /**
-   * Utils: construct params passed to views/security/login.ejs
+   * Utils: construct params passed to:
+   * views/security/login.ejs
    */
   loginViewParams(req, errors) {
     return {
@@ -327,7 +328,7 @@ module.exports = class SecurityController extends BassController {
     );
   }
   /**
-   * Load token (uses by confirm/password actions)
+   * Load token (used by confirm/password actions)
    */
   async loadToken(req, type) {
     const id = getParam(req, "id");
@@ -424,7 +425,10 @@ module.exports = class SecurityController extends BassController {
     res.render(view, this.confirmViewParams(title, message));
   }
   /**
-   * Utils: construct params passed to views/password.ejs
+   * Utils: construct params passed to:
+   * views/security/password.ejs
+   * views/security/error.ejs
+   * views/security/success.ejs
    */
   passwordViewParams(req, title, message, errors = {}) {
     return {
@@ -504,7 +508,9 @@ module.exports = class SecurityController extends BassController {
     res.render(view, this.passwordViewParams(req, title, message));
   }
   /**
-   * Utils: construct params passed to views/resend.ejs
+   * Utils: construct params passed to:
+   * views/security/resend.ejs
+   * views/security/success.ejs
    */
   resendViewParams(req, errors = {}) {
     return {
@@ -555,7 +561,9 @@ module.exports = class SecurityController extends BassController {
     });
   }
   /**
-   * Utils: construct params passed to views/recover.ejs
+   * Utils: construct params passed to:
+   * views/security/recover.ejs
+   * views/security/success.ejs
    */
   recoverViewParams(req, errors = {}) {
     return {
