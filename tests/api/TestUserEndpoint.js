@@ -53,13 +53,13 @@ describe("Test UserEndpoint", function() {
       .set("Authorization", `Bearer ${token}`)
       .send({
         username: "gazb",
-        email: "me@notu.com",
+        email: "me@email.com",
         password: "password"
       });
     id = response.body.id;
     expect(response.status).to.equal(200);
     expect(response.body.username).to.eql("gazb");
-    expect(response.body.email).to.eql("me@notu.com");
+    expect(response.body.email).to.eql("me@email.com");
   });
   it("test UserEndpoint update action", async function() {
     const response = await chai
@@ -67,11 +67,11 @@ describe("Test UserEndpoint", function() {
       .put(`/api/users/${id}`)
       .set("Authorization", `Bearer ${token}`)
       .send({
-        email: "you@notme.com"
+        email: "you@email.com"
       });
     expect(response.status).to.equal(200);
     expect(response.body.username).to.eql("gazb");
-    expect(response.body.email).to.eql("you@notme.com");
+    expect(response.body.email).to.eql("you@email.com");
   });
   it("test UserEndpoint delete action", async function() {
     let response = await chai
