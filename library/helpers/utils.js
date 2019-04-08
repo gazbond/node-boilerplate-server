@@ -66,6 +66,21 @@ const getParam = (req, name, def = "") => {
 };
 
 /**
+ * Extract header from req.headers or default value.
+ *
+ * @param {Request} req
+ * @param {string} name
+ * @param {*} def
+ */
+const getHeader = (req, name, def = "") => {
+  const header = req.get(name);
+  if (header) {
+    return header.trim();
+  }
+  return def;
+};
+
+/**
  * Extract param from req.body or default value.
  *
  * @param {Request} req
@@ -117,6 +132,7 @@ module.exports = {
   bindMethods,
   wrapAsync,
   getParam,
+  getHeader,
   getField,
   getFields,
   sleep

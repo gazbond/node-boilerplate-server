@@ -4,12 +4,13 @@ const Response = express.response;
 const Router = express.Router;
 const cors = require("cors");
 const { buildCheckFunction } = require("express-validator/check");
-const check = buildCheckFunction(["params", "query"]);
+const check = buildCheckFunction(["params", "query", "headers"]);
 const {
   validationErrors,
   bindMethods,
   wrapAsync,
   getParam,
+  getHeader,
   getFields
 } = require("./helpers/utils");
 
@@ -34,7 +35,12 @@ module.exports = class BassEndpoint {
     // CORS:
     this.cors = {
       methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-      allowedHeaders: ["Content-Type", "Authorization"],
+      allowedHeaders: [
+        "Content-Type",
+        "Authorization",
+        "X-Pagination-Current-Page",
+        "X-Pagination-Per-Page"
+      ],
       exposedHeaders: [
         "X-Pagination-Total-Count",
         "X-Pagination-Current-Page",
@@ -56,10 +62,27 @@ module.exports = class BassEndpoint {
         .isInt(),
       perPage: check("perPage", "Param 'perPage' is not an integer")
         .optional()
+        .isInt(),
+      xPagCurrentPage: check(
+        "X-Pagination-Current-Page",
+        "Header 'X-Pagination-Current-Page' is not an integer"
+      )
+        .optional()
+        .isInt(),
+      xPagPerPage: check(
+        "X-Pagination-Per-Page",
+        "Header 'X-Pagination-Per-Page' is not an integer"
+      )
+        .optional()
         .isInt()
     };
     this.validators = {
-      index: [this.check.page, this.check.perPage],
+      index: [
+        this.check.page,
+        this.check.perPage,
+        this.check.xPagCurrentPage,
+        this.check.xPagPerPage
+      ],
       view: [this.check.id],
       create: [],
       update: [this.check.id],
@@ -130,9 +153,17 @@ module.exports = class BassEndpoint {
       });
     }
     // Always have params or default
-    const perPage = getParam(req, "perPage", 30);
+    const perPage = getHeader(
+      req,
+      "X-Pagination-Per-Page",
+      getParam(req, "perPage", 30)
+    );
     // Indexed from 1
-    const currentPage = getParam(req, "page", 1);
+    const currentPage = getHeader(
+      req,
+      "X-Pagination-Current-Page",
+      getParam(req, "page", 1)
+    );
     // Indexed from 0
     const page = currentPage > 0 ? currentPage - 1 : 0;
     // Query
