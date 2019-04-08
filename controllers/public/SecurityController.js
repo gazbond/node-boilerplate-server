@@ -56,7 +56,7 @@ module.exports = class SecurityController extends BassController {
         .isLength({ min: 4 }),
       check("redirectUrl", "Param 'redirectUrl' should be a url.")
         .optional()
-        .isLength({ min: 1 })
+        .isURL({ require_tld: false, require_protocol: true })
     ];
     this.validators.confirm = [
       check("id", "Param 'id' should be an integer.")
@@ -205,7 +205,7 @@ module.exports = class SecurityController extends BassController {
   loginViewParams(req, errors) {
     return {
       errors: errors,
-      fields: ["login", "password"],
+      fields: ["login", "password", "redirectUrl"],
       login: getField(req, "login"),
       password: getField(req, "password")
     };
