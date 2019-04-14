@@ -14,6 +14,8 @@ const {
   getFields
 } = require("./helpers/utils");
 
+const findQuery = require("objection-find");
+
 /**
  * Base class for exposing models over http.
  */
@@ -74,14 +76,26 @@ module.exports = class BassEndpoint {
         "Header 'X-Pagination-Per-Page' is not an integer"
       )
         .optional()
-        .isInt()
+        .isInt(),
+      sort: check("sort", "Param 'sort' is not a string")
+        .optional()
+        .isString(),
+      order: check("order", "Param 'order' is not a string")
+        .optional()
+        .isIn(["ASC", "DESC"]),
+      filter: check("filter", "Param 'filter' is not JSON")
+        .optional()
+        .isJSON()
     };
     this.validators = {
       index: [
         this.check.page,
         this.check.perPage,
         this.check.xPagCurrentPage,
-        this.check.xPagPerPage
+        this.check.xPagPerPage,
+        this.check.sort,
+        this.check.order,
+        this.check.filter
       ],
       view: [this.check.id],
       create: [],
@@ -97,7 +111,7 @@ module.exports = class BassEndpoint {
       delete: []
     };
     // Eager load models:
-    this.eager = "";
+    this.eager = null;
     // Get 'this' in instance methods:
     bindMethods(this, [
       "initRouter",
@@ -145,6 +159,7 @@ module.exports = class BassEndpoint {
    * @param {Response} res
    */
   async actionIndex(req, res) {
+    // Validation
     const errors = validationErrors(req);
     if (!errors.isEmpty()) {
       // 400 Bad Request
@@ -152,7 +167,25 @@ module.exports = class BassEndpoint {
         errors: errors.mapped()
       });
     }
-    // Always have params or default
+    // Query
+    let query = this.Model.query();
+    // Filter
+    // TODO: (test side-effects) findQuery also handles pagination and eager loading
+    const filter = JSON.parse(getParam(req, "filter"));
+    if (typeof filter === "object") {
+      query = findQuery(this.Model).build(filter);
+    }
+    // Eager
+    if (this.eager) {
+      query = query.eager(this.eager);
+    }
+    // Sort
+    const sort = getParam(req, "sort");
+    const order = getParam(req, "order");
+    if (sort && order) {
+      query = query.orderBy(sort, order);
+    }
+    // Pagination
     const perPage = getHeader(
       req,
       "X-Pagination-Per-Page",
@@ -166,11 +199,8 @@ module.exports = class BassEndpoint {
     );
     // Indexed from 0
     const page = currentPage > 0 ? currentPage - 1 : 0;
-    // Query
-    const response = await this.Model.query()
-      .eager(this.eager)
-      .page(page, perPage);
     // Response
+    const response = await query.page(page, perPage);
     const total = response.total;
     const pageCount = Math.ceil(total / perPage);
     // Headers
