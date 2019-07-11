@@ -3,18 +3,7 @@ const chai = require("chai");
 const chaiHttp = require("chai-http");
 chai.use(chaiHttp);
 
-const { knex } = require("../../config");
 const server = "http://nodetest:7070";
-
-before(async function() {
-  await knex.migrate.latest();
-  await knex.seed.run({
-    directory: "./seeds/test"
-  });
-});
-after(async function() {
-  await knex.destroy();
-});
 
 describe("Test JWT authentication", function() {
   it("test UserEndpoint fails authentication", async function() {

@@ -1,23 +1,10 @@
 const expect = require("expect.js");
 
-const { knex } = require("../../config");
 const User = require("../../models/User");
 const Role = require("../../models/rbac/Role");
 const Permission = require("../../models/rbac/Permission");
 const RoleAssignment = require("../../models/rbac/RoleAssignment");
 const PermissionAssignment = require("../../models/rbac/PermissionAssignment");
-
-before(async function() {
-  await knex.migrate.latest();
-});
-beforeEach(async function() {
-  await knex.seed.run({
-    directory: "./seeds/test"
-  });
-});
-after(async function() {
-  await knex.destroy();
-});
 
 describe("Test rbac models", function() {
   it("tests removeRole(Role) and removePermission(Permission)", async function() {

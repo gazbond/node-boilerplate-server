@@ -1,21 +1,8 @@
 const expect = require("expect.js");
 const { ValidationError } = require("objection");
 
-const { knex } = require("../../config");
 const User = require("../../models/User");
 const Token = require("../../models/Token");
-
-before(async function() {
-  await knex.migrate.latest();
-});
-beforeEach(async function() {
-  await knex.seed.run({
-    directory: "./seeds/test"
-  });
-});
-after(async function() {
-  await knex.destroy();
-});
 
 describe("Test User model", function() {
   it("tests User username=root loads", async function() {
