@@ -19,6 +19,9 @@ module.exports = class Permission extends BaseClass {
       }
     };
   }
+  static get fields() {
+    return ["name"];
+  }
   static get visible() {
     return ["name"];
   }

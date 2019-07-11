@@ -22,6 +22,9 @@ module.exports = class Role extends BaseClass {
       }
     };
   }
+  static get fields() {
+    return ["name"];
+  }
   static get visible() {
     return ["name", "permissions"];
   }
