@@ -80,6 +80,18 @@ const UserEndpoint = require("./controllers/api/UserEndpoint");
 const userEndpoint = new UserEndpoint();
 routerApi.use(userEndpoint.initRouter());
 /**
+ * API role endpoint.
+ */
+const RoleEndpoint = require("./controllers/api/RoleEndpoint");
+const roleEndpoint = new RoleEndpoint();
+routerApi.use(roleEndpoint.initRouter());
+/**
+ * API permission endpoint.
+ */
+const PermissionEndpoint = require("./controllers/api/PermissionEndpoint");
+const permissionEndpoint = new PermissionEndpoint();
+routerApi.use(permissionEndpoint.initRouter());
+/**
  * API error handler.
  */
 routerApi.use((err, req, res, next) => {
