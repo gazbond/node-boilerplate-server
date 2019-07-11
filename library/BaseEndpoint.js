@@ -171,7 +171,7 @@ module.exports = class BassEndpoint {
     let query = this.Model.query();
     // Filter
     // TODO: (test side-effects) findQuery also handles pagination and eager loading
-    const filter = JSON.parse(getParam(req, "filter"));
+    const filter = JSON.parse(getParam(req, "filter", null));
     if (typeof filter === "object") {
       query = findQuery(this.Model).build(filter);
     }
