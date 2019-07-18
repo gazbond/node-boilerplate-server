@@ -117,6 +117,22 @@ const getFields = (req, model) => {
 };
 
 /**
+ * Construct model data from static visible().
+ */
+const getBody = (Model, model, excludeId = false) => {
+  const visible = Model.visible;
+  let body = {};
+  visible.forEach(field => {
+    if (model[field]) {
+      body[field] = model[field];
+    }
+  });
+  body.id = model.id;
+  if (excludeId) delete body.id;
+  return body;
+};
+
+/**
  * Block execution of all JavaScript by halting Node.js event loop.
  *
  * @param {number} ms
@@ -135,5 +151,6 @@ module.exports = {
   getHeader,
   getField,
   getFields,
+  getBody,
   sleep
 };
