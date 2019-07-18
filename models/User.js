@@ -13,14 +13,16 @@ const {
   baseUrl,
   models: {
     user: { emailConfirmation, roles }
-  }
+  },
+  elastic
 } = require("../config");
 const { sendEmail } = require("../library/helpers/email");
+const { getBody } = require("../library/helpers/utils");
 const Role = require("./rbac/Role");
 const RoleAssignment = require("./rbac/RoleAssignment");
 const Token = require("./Token");
 
-module.exports = class User extends BaseClass {
+class User extends BaseClass {
   static get tableName() {
     return "user_identity";
   }
@@ -74,6 +76,27 @@ module.exports = class User extends BaseClass {
           from: "user_identity.id",
           to: "user_token.user_id"
         }
+      }
+    };
+  }
+  static get indexName() {
+    return "users";
+  }
+  static get indexType() {
+    return "user";
+  }
+  static get indexMappings() {
+    return {
+      dynamic: "strict",
+      properties: {
+        id: { type: "long" },
+        username: { type: "text" },
+        email: { type: "text" },
+        password: { type: "text" },
+        auth_key: { type: "text" },
+        confirmed_at: { type: "date" },
+        created_at: { type: "date" },
+        updated_at: { type: "date" }
       }
     };
   }
@@ -172,7 +195,7 @@ module.exports = class User extends BaseClass {
     });
   }
   /**
-   * Generate auth key.
+   * Generate auth key, assign default role(s).
    */
   async $beforeInsert(queryContext) {
     await super.$beforeInsert(queryContext);
@@ -181,17 +204,18 @@ module.exports = class User extends BaseClass {
     this.auth_key = buffer.toString("hex");
   }
   /**
-   * Assign default role(s) and send confirmation email.
+   * Assign default role(s), send confirmation email and update index.
    */
   async $afterInsert(queryContext) {
-    await super.$afterInsert(queryContext);
     // Add roles
     if (roles && roles.length > 0) {
       await this.assignRoles(roles);
     }
+    // Send confirm email
     if (emailConfirmation) {
       await this.sendConfirmationEmail();
     }
+    await super.$afterInsert(queryContext);
   }
   /**
    * Remove role assignments.
@@ -217,4 +241,6 @@ module.exports = class User extends BaseClass {
         .whereInComposite(["type", "user_id", "code"], deletes);
     }
   }
-};
+}
+
+module.exports = User;
