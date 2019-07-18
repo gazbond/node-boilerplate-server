@@ -16,6 +16,9 @@ const {
 
 const findQuery = require("objection-find");
 
+// ElasticSearch.
+const { elastic } = require("../config");
+
 /**
  * Base class for exposing models over http.
  */
@@ -229,9 +232,22 @@ module.exports = class BassEndpoint {
       });
     }
     const id = getParam(req, "id");
-    const model = await this.Model.query()
-      .eager(this.eager)
-      .findById(id);
+    let model;
+    // Read database
+    if (this.Model.indexName === undefined) {
+      model = await this.Model.query()
+        .eager(this.eager)
+        .findById(id);
+    }
+    // Read index
+    else {
+      let result = await elastic.get({
+        id: id,
+        index: this.Model.indexName,
+        type: this.Model.indexType
+      });
+      model = result.body._source;
+    }
     if (!model) {
       // 404 Not Found
       return res.status(404).end();
