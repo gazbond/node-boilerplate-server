@@ -28,15 +28,15 @@ describe("Test UserEndpoint", async function() {
       .set("Authorization", `Bearer ${token}`);
     expect(response.status).to.equal(200);
     expect(response.body).to.be.an(Array);
-    response.body.forEach(async user => {
-      const id = user.id;
+    for (let i = 0; i < response.body.length; i++) {
+      const id = response.body[i].id;
       const current = await chai
         .request(server)
         .get(`/api/users/${id}`)
         .set("Authorization", `Bearer ${token}`);
       expect(current.status).to.equal(200);
       expect(current.body.id).to.equal(id);
-    });
+    }
   });
   let id;
   it("test UserEndpoint create action", async function() {
