@@ -1,10 +1,17 @@
 const { knex } = require("../../config");
+const { deleteIndices, createIndices, putMappings } = require("../../gulpfile");
 
 /**
- * Run migrations and seed database once.
+ * Run migrations and seed database and indices once.
  */
 before(async function() {
   await knex.migrate.latest();
+  // Run tasks individually instead of setupIndices()
+  // TODO: gulp series not executing synchronously
+  const cp = () => {};
+  await deleteIndices(cp);
+  await createIndices(cp);
+  await putMappings(cp);
   await knex.seed.run({
     directory: "./seeds/test"
   });
