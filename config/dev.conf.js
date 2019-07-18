@@ -4,15 +4,23 @@
  * ------------------------------------------------------
  */
 const config = require("../knexfile")["development"];
+
+// Relational Database.
 const knex = require("knex")(config);
+
 // Provide connection to models.
 const { Model } = require("objection");
 Model.knex(knex);
+
+// ElasticSearch connection.
+const { Client } = require("@elastic/elasticsearch");
+const client = new Client({ node: "http://elastic:9200" });
 
 module.exports = {
   name: "Node boilerplate server",
   baseUrl: "http://localhost:8080",
   knex: knex,
+  elastic: client,
   jwt: {
     secretOrKey: "md6a-gbs89le72ha8we7js-zo-awns67uw",
     expiresIn: "2 days"
