@@ -8,7 +8,7 @@ const server = "http://nodetest:7070";
 describe("Test RoleEndpoint", async function() {
   // Login:
   let token;
-  it("Login to /security/login", async function() {
+  it("test RoleEndpoint login to /security/login", async function() {
     // Login form returns { Authorization: <token> }
     const login = await chai
       .request(server)
