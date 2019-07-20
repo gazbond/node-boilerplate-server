@@ -10,8 +10,13 @@ const {
   bindMethods,
   wrapAsync,
   getParam,
-  getField
+  getField,
+  getHeader,
+  getBody
 } = require("../../library/helpers/utils");
+
+// ElasticSearch.
+const { elastic } = require("../../config");
 
 /**
  * User endpoint exposes User model over http.
@@ -68,7 +73,68 @@ module.exports = class UserEndpoint extends BaseEndpoint {
    * GET api/users
    */
   async actionIndex(req, res) {
-    return super.actionIndex(req, res);
+    // Validation
+    const errors = validationErrors(req);
+    if (!errors.isEmpty()) {
+      // 400 Bad Request
+      return res.status(400).send({
+        errors: errors.mapped()
+      });
+    }
+    // Filter
+    let filter = JSON.parse(getParam(req, "filter", null));
+    if (filter === null) {
+      filter = {
+        match_all: {}
+      };
+    }
+    // Sort
+    const sort = getParam(req, "sort", null);
+    // const order = getParam(req, "order");
+    // Pagination
+    const perPage = getHeader(
+      req,
+      "X-Pagination-Per-Page",
+      getParam(req, "perPage", 30)
+    );
+    // Indexed from 1
+    const currentPage = getHeader(
+      req,
+      "X-Pagination-Current-Page",
+      getParam(req, "page", 1)
+    );
+    // Indexed from 0
+    const page = currentPage > 0 ? currentPage - 1 : 0;
+    // Response
+    let response;
+    response = await elastic.search({
+      index: User.indexName,
+      type: User.indexType,
+      body: {
+        query: filter
+      },
+      size: perPage,
+      from: page,
+      sort: sort
+    });
+    const results = [];
+    response.body.hits.hits.forEach(result => {
+      results.push(getBody(User, result));
+    });
+    const total = response.body.hits.total;
+    const pageCount = Math.ceil(total / perPage);
+    // Headers
+    res.header({
+      "X-Pagination-Total-Count": total,
+      "X-Pagination-Current-Page": currentPage,
+      "X-Pagination-Per-Page": perPage,
+      "X-Pagination-Page-Count": pageCount,
+      // For react-admin
+      "Content-Range":
+        this.path.replace("/", "") + " 0-" + pageCount + "/" + total
+    });
+    // 200 OK
+    res.status(200).send(results);
   }
   /**
    * GET api/users/me
