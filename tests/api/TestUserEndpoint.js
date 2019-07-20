@@ -8,7 +8,7 @@ const server = "http://nodetest:7070";
 describe("Test UserEndpoint", async function() {
   // Login:
   let token;
-  it("Login to /security/login", async function() {
+  it("test UserEndpoint login to /security/login", async function() {
     // Login form returns { Authorization: <token> }
     const login = await chai
       .request(server)
@@ -26,7 +26,11 @@ describe("Test UserEndpoint", async function() {
       .request(server)
       .get("/api/users")
       .set("Authorization", `Bearer ${token}`);
+    // console.log("response: ", response);
+    // .set("X-Pagination-Per-Page", "10")
+    // .set("X-Pagination-Current-Page", "1");
     expect(response.status).to.equal(200);
+    // console.log("response: ", response);
     expect(response.body).to.be.an(Array);
     for (let i = 0; i < response.body.length; i++) {
       const id = response.body[i].id;
