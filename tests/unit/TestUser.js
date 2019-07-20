@@ -24,9 +24,9 @@ describe("Test User model", function() {
         expect(error.data).to.have.property("username");
         expect(error.data.username).to.eql([
           {
-            message: "should NOT be shorter than 1 characters",
+            message: "should NOT be shorter than 3 characters",
             keyword: "minLength",
-            params: { limit: 1 }
+            params: { limit: 3 }
           }
         ]);
         expect(error.data).to.have.property("email");
