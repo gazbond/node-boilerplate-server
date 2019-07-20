@@ -90,7 +90,6 @@ module.exports = class UserEndpoint extends BaseEndpoint {
     }
     // Sort
     const sort = getParam(req, "sort", null);
-    // const order = getParam(req, "order");
     // Pagination
     const perPage = getHeader(
       req,
