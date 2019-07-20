@@ -47,7 +47,7 @@ describe("Test User model", function() {
     const user = await User.query().insertAndFetch({
       username: "gaz",
       email: "test@gazbond.co.uk",
-      password: "password"
+      password: "Password1"
     });
     expect(user.password).to.be.a("string");
     expect(user.password).to.not.eql("password");
@@ -73,7 +73,7 @@ describe("Test User model", function() {
     const user = await User.query().insertAndFetch({
       username: "gaz",
       email: "test@gazbond.co.uk",
-      password: "password"
+      password: "Password1"
     });
     const roles = await user.$relatedQuery("roles");
     expect(roles).to.have.length(1);
@@ -83,7 +83,7 @@ describe("Test User model", function() {
     const user = await User.query().insertAndFetch({
       username: "gaz",
       email: "test@gazbond.co.uk",
-      password: "password"
+      password: "Password1"
     });
     // Load tokens
     let tokens = await user.$relatedQuery("tokens");

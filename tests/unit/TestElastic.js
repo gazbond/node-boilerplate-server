@@ -134,7 +134,7 @@ describe("Test ElasticSearch", function() {
     let user = await User.query().insertAndFetch({
       username: "gazBb",
       email: "test@gazbond.co.uk",
-      password: "password",
+      password: "Password1",
       confirmed_at: new Date().toISOString()
     });
     let results = await elastic.search({
@@ -184,7 +184,7 @@ describe("Test ElasticSearch", function() {
     let user = await User.query().insertAndFetch({
       username: "gazBb",
       email: "test@gazbond.co.uk",
-      password: "password",
+      password: "Password1",
       confirmed_at: new Date().toISOString()
     });
     let results = await elastic.search({

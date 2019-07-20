@@ -13,11 +13,9 @@ const {
   baseUrl,
   models: {
     user: { emailConfirmation, roles }
-  },
-  elastic
+  }
 } = require("../config");
 const { sendEmail } = require("../library/helpers/email");
-const { getBody } = require("../library/helpers/utils");
 const Role = require("./rbac/Role");
 const RoleAssignment = require("./rbac/RoleAssignment");
 const Token = require("./Token");
@@ -35,9 +33,14 @@ class User extends BaseClass {
       required: ["username", "email"],
       properties: {
         id: { type: "integer" },
-        username: { type: "string", minLength: 1, maxLength: 25 },
+        username: { type: "string", minLength: 3, maxLength: 25 },
         email: { type: "string", format: "email" },
-        password: { type: "string", minLength: 0, maxLength: 60 }
+        password: {
+          type: "string",
+          minLength: 8,
+          maxLength: 60,
+          pattern: "^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])"
+        }
       }
     };
   }

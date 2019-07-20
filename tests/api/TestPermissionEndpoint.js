@@ -16,7 +16,7 @@ describe("Test PermissionEndpoint", async function() {
       .set("Content-Type", "application/json")
       .send({
         login: "root",
-        password: "password"
+        password: "Password1"
       });
     token = login.body.Authorization;
   });

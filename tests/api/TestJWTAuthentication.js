@@ -18,7 +18,7 @@ describe("Test JWT authentication", function() {
       .set("Content-Type", "application/json")
       .send({
         login: "root",
-        password: "password"
+        password: "Password1"
       });
     expect(login.status).to.eql(200);
     const token = login.body.Authorization;

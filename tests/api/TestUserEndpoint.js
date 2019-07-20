@@ -16,7 +16,7 @@ describe("Test UserEndpoint", async function() {
       .set("Content-Type", "application/json")
       .send({
         login: "root",
-        password: "password"
+        password: "Password1"
       });
     token = login.body.Authorization;
   });
@@ -51,7 +51,7 @@ describe("Test UserEndpoint", async function() {
       .send({
         username: "gazb",
         email: "me@email.com",
-        password: "password"
+        password: "Password1"
       });
     id = response.body.id;
     expect(response.status).to.equal(200);
