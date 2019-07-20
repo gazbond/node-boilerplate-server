@@ -122,6 +122,9 @@ const getFields = (req, model) => {
 const getBody = (Model, model, excludeId = false) => {
   const visible = Model.visible;
   let body = {};
+  if (model._source) {
+    model = model._source;
+  }
   visible.forEach(field => {
     if (model[field]) {
       body[field] = model[field];
