@@ -14,7 +14,7 @@ Model.knex(knex);
 
 // ElasticSearch connection.
 const { Client } = require("@elastic/elasticsearch");
-const client = new Client({ node: "http://elastic:9200" });
+const client = new Client({ node: "http://elastic:elastic@elastic:9200" });
 
 module.exports = {
   name: "Node boilerplate server",
