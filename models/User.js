@@ -95,8 +95,7 @@ class User extends BaseClass {
         id: { type: "long" },
         username: { type: "text" },
         email: { type: "text" },
-        password: { type: "text" },
-        auth_key: { type: "text" },
+        roles: { type: "nested" },
         confirmed_at: { type: "date" },
         created_at: { type: "date" },
         updated_at: { type: "date" }

@@ -13,6 +13,9 @@ const {
   getField
 } = require("../../library/helpers/utils");
 
+// ElasticSearch.
+const { elastic } = require("../../config");
+
 /**
  * Role endpoint exposes Role model over http.
  */
@@ -142,6 +145,28 @@ module.exports = class RoleEndpoint extends BaseEndpoint {
       name: getField(req, "name")
     };
     const model = await this.Model.query().insertAndFetch(insert);
+    if (!model) {
+      // 404 Not Found
+      return res.status(404).end();
+    }
+    // 200 OK
+    res.status(200).send(model);
+  }
+  /**
+   * Using 'name' not 'id' for primary key.
+   */
+  async actionView(req, res) {
+    const errors = validationErrors(req);
+    if (!errors.isEmpty()) {
+      // 400 Bad Request
+      return res.status(400).send({
+        errors: errors.mapped()
+      });
+    }
+    const name = getParam(req, "id");
+    const model = await this.Model.query()
+      .eager(this.eager)
+      .findOne({ name: name });
     if (!model) {
       // 404 Not Found
       return res.status(404).end();
