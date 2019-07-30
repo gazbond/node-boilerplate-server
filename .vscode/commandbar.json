@@ -10,13 +10,22 @@
       "command": "docker exec node-boilerplate-server_node_1 npm run knex:migrate",
       "alignment": "left",
       "skipTerminateQuickPick": false,
-      "priority": 6
+      "priority": 7
     },
     {
       "text": "seed",
       "tooltip": "run knex seeds in docker container",
       "color": "yellow",
       "command": "docker exec node-boilerplate-server_node_1 npm run knex:seed",
+      "alignment": "left",
+      "skipTerminateQuickPick": false,
+      "priority": 6
+    },
+    {
+      "text": "indices",
+      "tooltip": "run gulp setipIndices command in docker container",
+      "color": "yellow",
+      "command": "docker exec node-boilerplate-server_node_1 npm run gulp:indices",
       "alignment": "left",
       "skipTerminateQuickPick": false,
       "priority": 5
