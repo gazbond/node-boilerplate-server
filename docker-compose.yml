@@ -44,7 +44,7 @@ services:
     elastic:
         image: docker.elastic.co/elasticsearch/elasticsearch:6.5.4
         environment:
-            - cluster.name=docker-cluster
+            - cluster.name=elastic
             - bootstrap.memory_lock=true
             - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
             - ELASTICSEARCH_USERNAME=elastic
@@ -58,7 +58,7 @@ services:
     elastictest:
         image: docker.elastic.co/elasticsearch/elasticsearch:6.5.4
         environment:
-            - cluster.name=docker-cluster
+            - cluster.name=elastictest
             - bootstrap.memory_lock=true
             - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
             - "discovery.zen.ping.unicast.hosts=elastic"
