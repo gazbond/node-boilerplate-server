@@ -12,28 +12,28 @@ const User = require("./models/User");
 /**
  * Delete all indices.
  */
-async function deleteIndices(cp) {
+async function delete_indices(cb) {
   await elastic.indices.delete({ index: "_all" });
-  cp();
+  cb();
 }
-exports.deleteIndices = deleteIndices;
+exports.delete_indices = delete_indices;
 
 /**
  * Create indices.
  */
-async function createIndices(cp) {
+async function create_indices(cb) {
   /**
    * Indices for User model:
    */
   await elastic.indices.create({ index: User.indexName });
-  cp();
+  cb();
 }
-exports.createIndices = createIndices;
+exports.create_indices = create_indices;
 
 /**
  * Put mappings.
  */
-async function putMappings(cp) {
+async function put_mappings(cb) {
   /**
    * Mappings for User model:
    */
@@ -42,14 +42,14 @@ async function putMappings(cp) {
     type: User.indexType,
     body: User.indexMappings
   });
-  cp();
+  cb();
 }
-exports.putMappings = putMappings;
+exports.put_mappings = put_mappings;
 
 /**
  * Re-index data from models.
  */
-async function reIndex(cp) {
+async function re_index(cb) {
   /**
    * Re-index for User model:
    */
@@ -64,16 +64,17 @@ async function reIndex(cp) {
     });
   }
   await knex.destroy();
-  cp();
+  cb();
 }
-exports.reIndex = reIndex;
+exports.re_index = re_index;
 
 /**
  * Generate Elastic Model class file **helpers**
  * Reads existing Model class as template.
  * Import model and set Model below.
  */
-async function elasticModel(cp) {
+async function elastic_model(cb) {
+  // Model to read from
   const Model = User;
   const lookup = {
     "character varying": "text",
@@ -105,15 +106,15 @@ async function elasticModel(cp) {
   // Generated default indexMappings() for Model.
   console.log(namesTypes);
   await knex.destroy();
-  cp();
+  cb();
 }
-exports.elasticModel = elasticModel;
+exports.elastic_model = elastic_model;
 
 /**
  * Delete and re-create indices and put mappings.
  */
-exports.default = exports.setupIndices = series(
-  deleteIndices,
-  createIndices,
-  putMappings
+exports.default = exports.setup_indices = series(
+  delete_indices,
+  create_indices,
+  put_mappings
 );

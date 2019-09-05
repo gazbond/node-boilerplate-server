@@ -19,7 +19,7 @@
     "start:test": "nodemon server.js",
     "start:docker": "npm install --quiet",
     "gulp": "gulp",
-    "gulp:indices": "gulp setupIndices"
+    "gulp:indices": "gulp setup_indices"
   },
   "dependencies": {
     "@elastic/elasticsearch": "^7.2.0",
