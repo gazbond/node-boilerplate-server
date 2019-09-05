@@ -312,8 +312,7 @@ module.exports = class SecurityController extends BassController {
         res.header("Authorization", token);
         // Send Set-Cookie header
         res.cookie("Authorization", token, {
-          httpOnly: true,
-          sameSite: true
+          httpOnly: false
         });
         if (isJsonContentType) {
           // 200 OK
