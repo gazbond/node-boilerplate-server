@@ -35,9 +35,10 @@ routerPublic.use(
   })
 );
 /**
- * Public home page and favicon.
+ * Public home page, favicon and bootstrap assets.
  */
 routerPublic.use(favicon("library/static/favicon.ico"));
+routerPublic.use(express.static("./node_modules/bootstrap/dist/"));
 routerPublic.get("/", (req, res) => {
   res.render("home", { name: config.name });
 });
