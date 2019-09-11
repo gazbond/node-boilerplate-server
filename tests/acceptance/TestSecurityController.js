@@ -2,11 +2,20 @@
 const path = require("path");
 const fs = require("fs");
 const { knex } = require("../../config");
+const {
+  delete_indices,
+  create_indices,
+  put_mappings
+} = require("../../gulpfile");
 
 BeforeSuite(async () => {
   await knex.migrate.latest();
-});
-Before(async () => {
+  // Run tasks individually instead of setup_indices()
+  // TODO: gulp series not executing synchronously
+  const cb = () => {};
+  await delete_indices(cb);
+  await create_indices(cb);
+  await put_mappings(cb);
   await knex.seed.run({
     directory: "./seeds/test"
   });
@@ -39,7 +48,7 @@ Scenario("test submitting wrong login form details", I => {
 Scenario("test submitting correct login form details", I => {
   I.amOnPage("/security/login");
   I.fillField("login", "root");
-  I.fillField("password", "password");
+  I.fillField("password", "Password1");
   I.click("Login");
   I.seeCookie("Authorization");
 });
@@ -119,8 +128,8 @@ Scenario("test following forgot password email link", async I => {
   I.click("Submit");
   I.see("Invalid Password, should be alpha-numeric.");
   I.see("Invalid confirm password, should be alpha-numeric.");
-  I.fillField("password", "newPassword");
-  I.fillField("confirm_password", "newPassword");
+  I.fillField("password", "newPassword1");
+  I.fillField("confirm_password", "newPassword1");
   I.click("Submit");
   I.see("Password Changed");
 });
