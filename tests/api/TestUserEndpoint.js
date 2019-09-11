@@ -26,12 +26,9 @@ describe("Test UserEndpoint", async function() {
       .request(server)
       .get("/api/users")
       .set("Authorization", `Bearer ${token}`);
-    // console.log("response: ", response);
-    // .set("X-Pagination-Per-Page", "10")
-    // .set("X-Pagination-Current-Page", "1");
     expect(response.status).to.equal(200);
-    // console.log("response: ", response);
     expect(response.body).to.be.an(Array);
+    expect(response.body.length).to.equal(2);
     for (let i = 0; i < response.body.length; i++) {
       const id = response.body[i].id;
       const current = await chai
@@ -129,5 +126,100 @@ describe("Test UserEndpoint", async function() {
       .delete(`/api/users/${id}`)
       .set("Authorization", `Bearer ${token}`);
     expect(response.status).to.equal(404);
+  });
+  it("test UserEndpoint 'filter' param with index (elasticsearch)", async function() {
+    let response = await chai
+      .request(server)
+      .get("/api/users")
+      .set("Authorization", `Bearer ${token}`)
+      .set({
+        "X-Filter": JSON.stringify({
+          match: {
+            username: "root"
+          }
+        })
+      })
+      .set({
+        "X-Sort": JSON.stringify({ updated_at: { order: "DESC" } })
+      });
+    expect(response.status).to.equal(200);
+    expect(response.body.length).to.equal(1);
+    expect(response.body[0].email).to.eql("dev@gazbond.co.uk");
+  });
+  it("test UserEndpoint 'filter' and 'order' param with index (postgresql)", async function() {
+    let response = await chai
+      .request(server)
+      .get("/api/users")
+      .set("Authorization", `Bearer ${token}`)
+      .set({
+        "X-Filter": JSON.stringify({
+          "username:eq": "root"
+        })
+      })
+      .set({
+        "X-Sort": "id"
+      })
+      .set({
+        "X-Order": "ASC"
+      });
+    expect(response.status).to.equal(200);
+    expect(response.body.length).to.equal(1);
+    expect(response.body[0].email).to.eql("dev@gazbond.co.uk");
+  });
+  it("test UserEndpoint pagination with index", async function() {
+    let response = await chai
+      .request(server)
+      .get("/api/users")
+      .set("Authorization", `Bearer ${token}`)
+      .query({
+        page: 1,
+        perPage: 1
+      });
+    expect(response.status).to.equal(200);
+    expect(response.body.length).to.equal(1);
+    const user = response.body[0];
+    response = await chai
+      .request(server)
+      .get("/api/users")
+      .set("Authorization", `Bearer ${token}`)
+      .query({
+        page: 2,
+        perPage: 1
+      });
+    expect(response.status).to.equal(200);
+    expect(response.body.length).to.equal(1);
+    expect(response.body[0].id).to.not.equal(user.id);
+  });
+  it("test UserEndpoint 'sort' param with index", async function() {
+    // Update a timestamp
+    let response = await chai
+      .request(server)
+      .get("/api/users/me")
+      .set("Authorization", `Bearer ${token}`);
+    response = await chai
+      .request(server)
+      .put(`/api/users/${response.body.id}`)
+      .set("Authorization", `Bearer ${token}`)
+      .send({
+        email: "you@email.com"
+      });
+    // List ascending
+    response = await chai
+      .request(server)
+      .get("/api/users")
+      .set("Authorization", `Bearer ${token}`)
+      .set({
+        "X-Sort": JSON.stringify({ updated_at: { order: "ASC" } })
+      });
+    //console.log("response: ", response.body);
+    // List descending
+    response = await chai
+      .request(server)
+      .get("/api/users")
+      .set("Authorization", `Bearer ${token}`)
+      .set({
+        "X-Sort": JSON.stringify({ updated_at: { order: "DESC" } })
+      });
+    //console.log("response: ", response.body);
   });
 });

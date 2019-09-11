@@ -44,7 +44,10 @@ module.exports = class BassEndpoint {
         "Content-Type",
         "Authorization",
         "X-Pagination-Current-Page",
-        "X-Pagination-Per-Page"
+        "X-Pagination-Per-Page",
+        "X-Filter",
+        "X-Sort",
+        "X-Order"
       ],
       exposedHeaders: [
         "X-Pagination-Total-Count",
@@ -62,31 +65,40 @@ module.exports = class BassEndpoint {
           checkFalsy: true
         })
         .isInt(),
-      page: check("page", "Param 'page' is not an integer")
+      page: check("page", "Param 'page' isn't an integer")
         .optional()
         .isInt(),
-      perPage: check("perPage", "Param 'perPage' is not an integer")
+      perPage: check("perPage", "Param 'perPage' isn't an integer")
         .optional()
         .isInt(),
-      xPagCurrentPage: check(
+      xPaginationCurrentPage: check(
         "X-Pagination-Current-Page",
-        "Header 'X-Pagination-Current-Page' is not an integer"
+        "Header 'X-Pagination-Current-Page' isn't an integer"
       )
         .optional()
         .isInt(),
-      xPagPerPage: check(
+      xPaginationPerPage: check(
         "X-Pagination-Per-Page",
-        "Header 'X-Pagination-Per-Page' is not an integer"
+        "Header 'X-Pagination-Per-Page' isn't an integer"
       )
         .optional()
         .isInt(),
-      sort: check("sort", "Param 'sort' is not a string")
+      sort: check("sort", "Param 'sort' isn't a string")
         .optional()
         .isString(),
-      order: check("order", "Param 'order' is not a string")
+      order: check("order", "Param 'order' isn't 'ASC' or 'DESC'")
         .optional()
         .isIn(["ASC", "DESC"]),
-      filter: check("filter", "Param 'filter' is not JSON")
+      filter: check("filter", "Param 'filter' isn't JSON")
+        .optional()
+        .isJSON(),
+      xSort: check("X-Sort", "Header 'X-Sort' isn't a string")
+        .optional()
+        .isString(),
+      xOrder: check("X-Order", "Header 'X-Order' isn't 'ASC' or 'DESC'")
+        .optional()
+        .isIn(["ASC", "DESC"]),
+      xFilter: check("X-Filter", "Header 'X-Filter' isn't JSON")
         .optional()
         .isJSON()
     };
@@ -94,11 +106,14 @@ module.exports = class BassEndpoint {
       index: [
         this.check.page,
         this.check.perPage,
-        this.check.xPagCurrentPage,
-        this.check.xPagPerPage,
+        this.check.xPaginationCurrentPage,
+        this.check.xPaginationPerPage,
         this.check.sort,
         this.check.order,
-        this.check.filter
+        this.check.filter,
+        this.check.xSort,
+        this.check.xOrder,
+        this.check.xFilter
       ],
       view: [this.check.id],
       create: [],
@@ -174,7 +189,10 @@ module.exports = class BassEndpoint {
     let query = this.Model.query();
     // Filter
     // TODO: (test side-effects) findQuery also handles pagination and eager loading
-    const filter = JSON.parse(getParam(req, "filter", null));
+    let filter = getHeader(req, "X-Filter", getParam(req, "filter", null));
+    if (filter) {
+      filter = JSON.parse(filter);
+    }
     if (typeof filter === "object") {
       query = findQuery(this.Model).build(filter);
     }
@@ -182,9 +200,9 @@ module.exports = class BassEndpoint {
     if (this.eager) {
       query = query.eager(this.eager);
     }
-    // Sort
-    const sort = getParam(req, "sort");
-    const order = getParam(req, "order");
+    // Sort and order
+    const sort = getHeader(req, "X-Sort", getParam(req, "sort", null));
+    let order = getHeader(req, "X-Order", getParam(req, "order", null));
     if (sort && order) {
       query = query.orderBy(sort, order);
     }
@@ -202,7 +220,7 @@ module.exports = class BassEndpoint {
     );
     // Indexed from 0
     const page = currentPage > 0 ? currentPage - 1 : 0;
-    // Response
+    // Search
     const response = await query.page(page, perPage);
     const total = response.total;
     const pageCount = Math.ceil(total / perPage);

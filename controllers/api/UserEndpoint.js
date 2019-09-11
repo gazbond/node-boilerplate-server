@@ -14,6 +14,7 @@ const {
   getHeader,
   getBody
 } = require("../../library/helpers/utils");
+const cors = require("cors");
 
 // ElasticSearch.
 const { elastic } = require("../../config");
@@ -31,6 +32,12 @@ module.exports = class UserEndpoint extends BaseEndpoint {
         checkFalsy: true
       })
       .isString();
+    this.check.sort = check("sort", "Param 'sort' isn't JSON")
+      .optional()
+      .isJSON();
+    this.check.xSort = check("xSort", "Header 'xSort' isn't JSON")
+      .optional()
+      .isJSON();
     this.validators.assign = [this.check.id, this.check.name];
     this.validators.remove = [this.check.id, this.check.name];
     const readMiddleware = [
@@ -55,7 +62,13 @@ module.exports = class UserEndpoint extends BaseEndpoint {
     bindMethods(this, ["actionMe", "actionAssignRole", "actionRemoveRole"]);
   }
   initRouter() {
-    this.router.get("/users/me", this.middleware.me, wrapAsync(this.actionMe));
+    // Must be before other routes
+    this.router.get(
+      "/users/me",
+      [cors(this.cors), this.middleware.me],
+      wrapAsync(this.actionMe)
+    );
+    super.initRouter();
     this.router.post(
       "/users/:id/role",
       this.middleware.assign.concat(this.validators.assign),
@@ -66,13 +79,23 @@ module.exports = class UserEndpoint extends BaseEndpoint {
       this.middleware.remove.concat(this.validators.remove),
       wrapAsync(this.actionRemoveRole)
     );
-    super.initRouter();
     return this.router;
   }
   /**
-   * GET api/users
+   * GET api/users (using search index)
    */
   async actionIndex(req, res) {
+    // Sort and order
+    let sort = getHeader(req, "X-Sort", getParam(req, "sort", null));
+    let order = getHeader(req, "X-Order", getParam(req, "order", null));
+    // Use relational database
+    if (sort && order) {
+      return super.actionIndex(req, res);
+    }
+    // Parse if not relational database
+    if (sort) {
+      sort = JSON.parse(sort);
+    }
     // Validation
     const errors = validationErrors(req);
     if (!errors.isEmpty()) {
@@ -82,14 +105,14 @@ module.exports = class UserEndpoint extends BaseEndpoint {
       });
     }
     // Filter
-    let filter = JSON.parse(getParam(req, "filter", null));
-    if (filter === null) {
+    let filter = getHeader(req, "X-Filter", getParam(req, "filter", null));
+    if (filter) {
+      filter = JSON.parse(filter);
+    } else {
       filter = {
         match_all: {}
       };
     }
-    // Sort
-    const sort = getParam(req, "sort", null);
     // Pagination
     const perPage = getHeader(
       req,
@@ -104,18 +127,22 @@ module.exports = class UserEndpoint extends BaseEndpoint {
     );
     // Indexed from 0
     const page = currentPage > 0 ? currentPage - 1 : 0;
-    // Response
-    let response;
-    response = await elastic.search({
+    // Search config
+    const config = {
       index: User.indexName,
       type: User.indexType,
       body: {
         query: filter
       },
-      size: perPage,
-      from: page,
-      sort: sort
-    });
+      from: perPage * page,
+      size: perPage
+    };
+    if (sort) {
+      config.sort = sort;
+    }
+    // Search
+    const response = await elastic.search(config);
+
     const results = [];
     response.body.hits.hits.forEach(result => {
       results.push(getBody(User, result));
