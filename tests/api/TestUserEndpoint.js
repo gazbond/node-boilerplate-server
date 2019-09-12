@@ -208,18 +208,29 @@ describe("Test UserEndpoint", async function() {
       .request(server)
       .get("/api/users")
       .set("Authorization", `Bearer ${token}`)
+      .set(
+        "X-Filter",
+        JSON.stringify({
+          bool: {
+            should: [
+              { term: { username: "root" } },
+              { term: { username: "gazbond" } }
+            ]
+          }
+        })
+      )
       .set({
-        "X-Sort": JSON.stringify({ updated_at: { order: "ASC" } })
+        "X-Sort": JSON.stringify({ updated_at: "desc" })
       });
-    //console.log("response: ", response.body);
+    // console.log("response: ", response.body);
     // List descending
     response = await chai
       .request(server)
       .get("/api/users")
       .set("Authorization", `Bearer ${token}`)
       .set({
-        "X-Sort": JSON.stringify({ updated_at: { order: "DESC" } })
+        "X-Sort": JSON.stringify({ updated_at: "desc" })
       });
-    //console.log("response: ", response.body);
+    // console.log("response: ", response.body);
   });
 });
