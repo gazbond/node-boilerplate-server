@@ -7,7 +7,7 @@
       "text": "migrate",
       "tooltip": "run knex migrations in docker container",
       "color": "yellow",
-      "command": "docker exec node-boilerplate-server_node_1 npm run knex:migrate",
+      "command": "docker exec submithub-clone-server_node_1 npm run knex:migrate",
       "alignment": "left",
       "skipTerminateQuickPick": false,
       "priority": 7
@@ -16,7 +16,7 @@
       "text": "seed",
       "tooltip": "run knex seeds in docker container",
       "color": "yellow",
-      "command": "docker exec node-boilerplate-server_node_1 npm run knex:seed",
+      "command": "docker exec submithub-clone-server_node_1 npm run knex:seed",
       "alignment": "left",
       "skipTerminateQuickPick": false,
       "priority": 6
@@ -25,7 +25,7 @@
       "text": "indices",
       "tooltip": "run gulp setipIndices command in docker container",
       "color": "yellow",
-      "command": "docker exec node-boilerplate-server_node_1 npm run gulp:indices",
+      "command": "docker exec submithub-clone-server_node_1 npm run gulp:indices",
       "alignment": "left",
       "skipTerminateQuickPick": false,
       "priority": 5
@@ -34,7 +34,7 @@
       "text": "cept",
       "tooltip": "run codecept tests in docker container",
       "color": "yellow",
-      "command": "docker exec node-boilerplate-server_nodetest_1 npm run test:cept",
+      "command": "docker exec submithub-clone-server_nodetest_1 npm run test:cept",
       "alignment": "left",
       "skipTerminateQuickPick": false,
       "priority": 4
@@ -43,7 +43,7 @@
       "text": "api",
       "tooltip": "run mocha api tests in docker container",
       "color": "yellow",
-      "command": "docker exec node-boilerplate-server_nodetest_1 npm run test:api",
+      "command": "docker exec submithub-clone-server_nodetest_1 npm run test:api",
       "alignment": "left",
       "skipTerminateQuickPick": false,
       "priority": 3
@@ -52,7 +52,7 @@
       "text": "unit",
       "tooltip": "run mocha unit tests in docker container",
       "color": "yellow",
-      "command": "docker exec node-boilerplate-server_nodetest_1 npm run test:unit",
+      "command": "docker exec submithub-clone-server_nodetest_1 npm run test:unit",
       "alignment": "left",
       "skipTerminateQuickPick": false,
       "priority": 2

@@ -17,7 +17,7 @@ const { Client } = require("@elastic/elasticsearch");
 const client = new Client({ node: "http://elastic:elastic@elastic:9200" });
 
 module.exports = {
-  name: "Node boilerplate server",
+  name: "Submithub clone server",
   baseUrl: "http://localhost:8080",
   knex: knex,
   elastic: client,

@@ -1,7 +1,7 @@
 {
-  "name": "node-boilerplate-server",
+  "name": "submithub-clone-server",
   "version": "1.0.0",
-  "description": "node boilerplate server",
+  "description": "submithub clone server",
   "author": "gazbond.co.uk",
   "license": "MIT",
   "scripts": {
