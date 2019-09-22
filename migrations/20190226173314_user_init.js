@@ -8,6 +8,9 @@ exports.up = async function(knex) {
       .increments()
       .unsigned()
       .notNullable();
+    table
+      .enu("status", ["unconfirmed", "active", "suspended", "deleted"])
+      .notNullable();
     table.string("username", 25).notNullable();
     table.string("email", 255).notNullable();
     table.string("password", 60);
@@ -20,6 +23,7 @@ exports.up = async function(knex) {
       .increments()
       .unsigned()
       .notNullable();
+    table.enu("status", ["visible", "hidden", "deleted"]).notNullable();
     table.string("phone", 25);
     table.string("bio", 255);
     table
