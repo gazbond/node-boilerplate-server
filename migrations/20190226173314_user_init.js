@@ -9,8 +9,13 @@ exports.up = async function(knex) {
       .unsigned()
       .notNullable();
     table
-      .enu("status", ["unconfirmed", "active", "suspended", "deleted"])
-      .notNullable();
+      // @ts-ignore
+      .enu("status", ["unconfirmed", "active", "suspended", "deleted"], {
+        useNative: true,
+        enumName: "user_identity_status"
+      })
+      .notNullable()
+      .defaultTo("unconfirmed");
     table.string("username", 25).notNullable();
     table.string("email", 255).notNullable();
     table.string("password", 60);
@@ -23,7 +28,14 @@ exports.up = async function(knex) {
       .increments()
       .unsigned()
       .notNullable();
-    table.enu("status", ["visible", "hidden", "deleted"]).notNullable();
+    table
+      // @ts-ignore
+      .enu("status", ["visible", "hidden", "deleted"], {
+        useNative: true,
+        enumName: "user_profile_status"
+      })
+      .notNullable()
+      .defaultTo("visible");
     table.string("phone", 25);
     table.string("bio", 255);
     table

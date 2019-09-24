@@ -35,6 +35,7 @@ exports.seed = async function(knex) {
    */
   const User = require("../models/User");
   const rootUser = await User.query().insertAndFetch({
+    status: "active",
     username: "root",
     email: "dev@gazbond.co.uk",
     password: "Password1",
@@ -46,6 +47,7 @@ exports.seed = async function(knex) {
    * Known user with default roles.
    */
   const gazbondUser = await User.query().insertAndFetch({
+    status: "active",
     username: "gazbond",
     email: "gaz@gazbond.co.uk",
     password: "Password1",
@@ -59,6 +61,7 @@ exports.seed = async function(knex) {
   const usersCount = 28;
   for (let i = 0; i <= usersCount; i++) {
     await User.query().insert({
+      status: "active",
       username: faker.internet.userName(),
       email: faker.internet.email(),
       password: "Password1",

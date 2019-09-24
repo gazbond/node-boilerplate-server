@@ -8,7 +8,14 @@ exports.up = async function(knex) {
       .increments()
       .unsigned()
       .notNullable();
-    table.enu("status", ["visible", "hidden", "deleted"]).notNullable();
+    table
+      // @ts-ignore
+      .enu("status", ["visible", "hidden", "deleted"], {
+        useNative: true,
+        enumName: "app_media_status"
+      })
+      .notNullable()
+      .defaultTo("visible");
     table
       .integer("user_id")
       .unsigned()
@@ -33,14 +40,17 @@ exports.up = async function(knex) {
       .unsigned()
       .notNullable();
     table
-      .enu("status", [
-        "draft",
-        "submitted",
-        "cancelled",
-        "completed",
-        "deleted"
-      ])
-      .notNullable();
+      .enu(
+        "status",
+        ["draft", "submitted", "cancelled", "completed", "deleted"],
+        // @ts-ignore
+        {
+          useNative: true,
+          enumName: "app_campaign_status"
+        }
+      )
+      .notNullable()
+      .defaultTo("draft");
     table
       .integer("submitter_id")
       .unsigned()
@@ -62,7 +72,14 @@ exports.up = async function(knex) {
       .increments()
       .unsigned()
       .notNullable();
-    table.enu("status", ["visible", "hidden", "deleted"]).notNullable();
+    table
+      // @ts-ignore
+      .enu("status", ["visible", "hidden", "deleted"], {
+        useNative: true,
+        enumName: "app_submission_status"
+      })
+      .notNullable()
+      .defaultTo("visible");
     table
       .integer("submitter_id")
       .unsigned()
@@ -87,7 +104,14 @@ exports.up = async function(knex) {
       .increments()
       .unsigned()
       .notNullable();
-    table.enu("status", ["visible", "hidden", "deleted"]).notNullable();
+    table
+      // @ts-ignore
+      .enu("status", ["visible", "hidden", "deleted"], {
+        useNative: true,
+        enumName: "app_review_status"
+      })
+      .notNullable()
+      .defaultTo("visible");
     table
       .integer("reviewer_id")
       .unsigned()
@@ -106,7 +130,14 @@ exports.up = async function(knex) {
       .increments()
       .unsigned()
       .notNullable();
-    table.enu("status", ["visible", "hidden", "deleted"]).notNullable();
+    table
+      // @ts-ignore
+      .enu("status", ["visible", "hidden", "deleted"], {
+        useNative: true,
+        enumName: "app_comment_status"
+      })
+      .notNullable()
+      .defaultTo("visible");
     table
       .integer("user_id")
       .unsigned()
@@ -125,7 +156,14 @@ exports.up = async function(knex) {
       .increments()
       .unsigned()
       .notNullable();
-    table.enu("status", ["paid", "refund"]).notNullable();
+    table
+      // @ts-ignore
+      .enu("status", ["paid", "refund"], {
+        useNative: true,
+        enumName: "app_credit_status"
+      })
+      .notNullable()
+      .defaultTo("paid");
     table
       .integer("submitter_id")
       .unsigned()
@@ -146,7 +184,14 @@ exports.up = async function(knex) {
       .increments()
       .unsigned()
       .notNullable();
-    table.enu("status", ["paid", "refund"]).notNullable();
+    table
+      // @ts-ignore
+      .enu("status", ["paid", "refund"], {
+        useNative: true,
+        enumName: "app_debit_status"
+      })
+      .notNullable()
+      .defaultTo("paid");
     table
       .integer("reviewer_id")
       .unsigned()

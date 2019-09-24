@@ -132,6 +132,7 @@ describe("Test ElasticSearch", function() {
   });
   it("tests storing/updating models updates ElasticSearch index", async function() {
     let user = await User.query().insertAndFetch({
+      status: "active",
       username: "gazBb",
       email: "test@gazbond.co.uk",
       password: "Password1",
@@ -182,6 +183,7 @@ describe("Test ElasticSearch", function() {
   });
   it("tests deleting models updates ElasticSearch index", async function() {
     let user = await User.query().insertAndFetch({
+      status: "active",
       username: "gazBb",
       email: "test@gazbond.co.uk",
       password: "Password1",
