@@ -33,6 +33,10 @@ class User extends BaseClass {
       required: ["username", "email"],
       properties: {
         id: { type: "integer" },
+        status: {
+          type: "string",
+          enum: ["unconfirmed", "active", "suspended", "deleted"]
+        },
         username: { type: "string", minLength: 3, maxLength: 25 },
         email: { type: "string", format: "email" },
         password: {
