@@ -19,30 +19,8 @@ exports.up = async function(knex) {
     table.string("username", 25).notNullable();
     table.string("email", 255).notNullable();
     table.string("password", 60);
-    table.string("auth_key", 32);
+    table.string("auth_key", 32).notNullable();
     table.timestamp("confirmed_at");
-    table.timestamps();
-  });
-  await knex.schema.createTable("user_profile", function(table) {
-    table
-      .increments()
-      .unsigned()
-      .notNullable();
-    table
-      // @ts-ignore
-      .enu("status", ["visible", "hidden", "deleted"], {
-        useNative: true,
-        enumName: "user_profile_status"
-      })
-      .notNullable()
-      .defaultTo("visible");
-    table.string("phone", 25);
-    table.string("bio", 255);
-    table
-      .integer("user_id")
-      .unsigned()
-      .notNullable();
-    table.foreign("user_id").references("user_identity.id");
     table.timestamps();
   });
   await knex.schema.createTable("user_token", function(table) {
@@ -60,6 +38,5 @@ exports.up = async function(knex) {
 
 exports.down = async function(knex) {
   await knex.schema.dropTable("user_token");
-  await knex.schema.dropTable("user_profile");
   await knex.schema.dropTable("user_identity");
 };
