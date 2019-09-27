@@ -1,8 +1,10 @@
 const { Model } = require("objection");
-const { DbErrors } = require("objection-db-errors");
-const BaseClass = DbErrors(Model);
+const BaseModel = require("../library/BaseModel");
+const User = require("./User");
+const Credit = require("./Credit");
+const Campaign = require("./Campaign");
 
-module.exports = class Debit extends BaseClass {
+module.exports = class Debit extends BaseModel {
   static get tableName() {
     return "app_debit";
   }
@@ -13,6 +15,23 @@ module.exports = class Debit extends BaseClass {
     return {};
   }
   static get relationMappings() {
-    return {};
+    return {
+      reviewer: {
+        relation: Model.HasOneRelation,
+        modelClass: User,
+        join: {
+          from: "app_debit.reviewer_id",
+          to: "user_identity.id"
+        }
+      },
+      credit: {
+        relation: Model.BelongsToOneRelation,
+        modelClass: Credit,
+        join: {
+          from: "app_debit.credit_id",
+          to: "app_credit.id"
+        }
+      }
+    };
   }
 };

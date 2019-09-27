@@ -1,10 +1,11 @@
 const { Model } = require("objection");
-const { DbErrors } = require("objection-db-errors");
-const BaseClass = DbErrors(Model);
+const BaseModel = require("../library/BaseModel");
+const User = require("./User");
+const Media = require("./Media");
 
-module.exports = class Profile extends BaseClass {
+module.exports = class Profile extends BaseModel {
   static get tableName() {
-    return "user_profile";
+    return "app_profile";
   }
   static get idColumn() {
     return "id";
@@ -13,6 +14,31 @@ module.exports = class Profile extends BaseClass {
     return {};
   }
   static get relationMappings() {
-    return {};
+    return {
+      user: {
+        relation: Model.HasOneRelation,
+        modelClass: User,
+        join: {
+          from: "app_profile.user_id",
+          to: "user_identity.id"
+        }
+      },
+      artwork: {
+        relation: Model.HasOneRelation,
+        modelClass: Media,
+        join: {
+          from: "app_profile.artwork_id",
+          to: "app_media.id"
+        }
+      },
+      thumb: {
+        relation: Model.HasOneRelation,
+        modelClass: Media,
+        join: {
+          from: "app_profile.thumb_id",
+          to: "app_media.id"
+        }
+      }
+    };
   }
 };

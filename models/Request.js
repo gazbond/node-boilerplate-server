@@ -1,15 +1,14 @@
 const { Model } = require("objection");
 const BaseModel = require("../library/BaseModel");
 const User = require("./User");
-const Media = require("./Media");
 const Campaign = require("./Campaign");
 
-module.exports = class Review extends BaseModel {
+module.exports = class Request extends BaseModel {
   static get tableName() {
-    return "app_review";
+    return "app_request";
   }
   static get idColumn() {
-    return "id";
+    return ["campaign_id", "review_id"];
   }
   static get jsonSchema() {
     return {};
@@ -20,7 +19,7 @@ module.exports = class Review extends BaseModel {
         relation: Model.HasOneRelation,
         modelClass: User,
         join: {
-          from: "app_review.reviewer_id",
+          from: "app_request.reviewer_id",
           to: "user_identity.id"
         }
       },
@@ -28,7 +27,7 @@ module.exports = class Review extends BaseModel {
         relation: Model.HasOneRelation,
         modelClass: Campaign,
         join: {
-          from: "app_review.campaign_id",
+          from: "app_request.campaign_id",
           to: "app_campaign.id"
         }
       }

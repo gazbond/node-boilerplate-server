@@ -1,8 +1,8 @@
 const { Model } = require("objection");
-const { DbErrors } = require("objection-db-errors");
-const BaseClass = DbErrors(Model);
+const BaseModel = require("../library/BaseModel");
+const User = require("./User");
 
-module.exports = class Media extends BaseClass {
+module.exports = class Media extends BaseModel {
   static get tableName() {
     return "app_media";
   }
@@ -13,6 +13,15 @@ module.exports = class Media extends BaseClass {
     return {};
   }
   static get relationMappings() {
-    return {};
+    return {
+      user: {
+        relation: Model.HasOneRelation,
+        modelClass: User,
+        join: {
+          from: "app_media.user_id",
+          to: "user_identity.id"
+        }
+      }
+    };
   }
 };

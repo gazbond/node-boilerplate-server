@@ -1,8 +1,9 @@
 const { Model } = require("objection");
-const { DbErrors } = require("objection-db-errors");
-const BaseClass = DbErrors(Model);
+const BaseModel = require("../library/BaseModel");
+const User = require("./User");
+const Campaign = require("./Campaign");
 
-module.exports = class Comment extends BaseClass {
+module.exports = class Comment extends BaseModel {
   static get tableName() {
     return "app_comment";
   }
@@ -13,6 +14,23 @@ module.exports = class Comment extends BaseClass {
     return {};
   }
   static get relationMappings() {
-    return {};
+    return {
+      user: {
+        relation: Model.HasOneRelation,
+        modelClass: User,
+        join: {
+          from: "app_comment.user_id",
+          to: "user_identity.id"
+        }
+      },
+      campaign: {
+        relation: Model.HasOneRelation,
+        modelClass: Campaign,
+        join: {
+          from: "app_comment.campaign_id",
+          to: "app_campaign.id"
+        }
+      }
+    };
   }
 };
