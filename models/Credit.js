@@ -22,14 +22,6 @@ module.exports = class Credit extends BaseModel {
           from: "app_credit.submitter_id",
           to: "user_identity.id"
         }
-      },
-      campaign: {
-        relation: Model.BelongsToOneRelation,
-        modelClass: Campaign,
-        join: {
-          from: "app_credit.campaign_id",
-          to: "app_campaign.id"
-        }
       }
     };
   }

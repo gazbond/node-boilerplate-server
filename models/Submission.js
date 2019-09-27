@@ -2,7 +2,6 @@ const { Model } = require("objection");
 const BaseModel = require("../library/BaseModel");
 const User = require("./User");
 const Media = require("./Media");
-const Campaign = require("./Campaign");
 
 module.exports = class Submission extends BaseModel {
   static get tableName() {
