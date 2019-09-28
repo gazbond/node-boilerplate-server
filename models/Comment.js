@@ -10,7 +10,20 @@ module.exports = class Comment extends BaseModel {
     return "id";
   }
   static get jsonSchema() {
-    return {};
+    return {
+      type: "object",
+      required: ["user_id", "campaign_id", "text"],
+      properties: {
+        id: { type: "integer" },
+        user_id: { type: "integer" },
+        campaign_id: { type: "integer" },
+        status: {
+          type: "string",
+          enum: ["visible", "hidden", "deleted"]
+        },
+        text: { type: "string" }
+      }
+    };
   }
   static get relationMappings() {
     return {

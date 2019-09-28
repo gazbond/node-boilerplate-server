@@ -26,7 +26,8 @@ module.exports = class Token extends BaseClass {
       required: ["type", "user_id"],
       properties: {
         type: { type: "integer" },
-        user_id: { type: "integer" }
+        user_id: { type: "integer" },
+        code: { type: "string", maxLength: 32 }
       }
     };
   }
@@ -35,7 +36,7 @@ module.exports = class Token extends BaseClass {
     const User = require("./User");
     return {
       user: {
-        relation: Model.BelongsToOneRelation,
+        relation: Model.HasOneRelation,
         modelClass: User,
         join: {
           from: "user_token.user_id",

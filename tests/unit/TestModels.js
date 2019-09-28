@@ -128,4 +128,212 @@ describe("Test common model features", function() {
     expect(campaign.comments.length).to.equal(1);
     expect(campaign.comments[0].id).to.equal(comment.id);
   });
+  it("tests model validations are working", async function() {
+    let user;
+    try {
+      user = await User.query().insertAndFetch({
+        status: "wrong",
+        username: "invalid username",
+        email: "invalid email",
+        password: "invalid password"
+      });
+    } catch (err) {
+      expect(err.statusCode).to.equal(400);
+      expect(err.data).to.have.property("status");
+      expect(err.data).to.have.property("username");
+      expect(err.data).to.have.property("email");
+      expect(err.data).to.have.property("password");
+    }
+    user = await User.query().insertAndFetch({
+      username: "testing_validations_user",
+      email: "test@gazbond.co.uk",
+      password: "Password1"
+    });
+    let media;
+    try {
+      media = await Media.query().insertAndFetch({
+        status: "wrong",
+        user_id: "wrong",
+        type: "wrong",
+        url: "not a url"
+      });
+    } catch (err) {
+      expect(err.statusCode).to.equal(400);
+      expect(err.data).to.have.property("status");
+      expect(err.data).to.have.property("user_id");
+      expect(err.data).to.have.property("type");
+      expect(err.data).to.have.property("url");
+    }
+    media = await Media.query().insertAndFetch({
+      user_id: user.id,
+      type: "image",
+      url: "https://i1.sndcdn.com/avatars-000488602248-893hp7-t200x200.jpg"
+    });
+    let profile;
+    try {
+      profile = await Profile.query().insertAndFetch({
+        status: "wrong",
+        user_id: "wrong",
+        artwork_id: "wrong",
+        thumb_id: "wrong"
+      });
+    } catch (err) {
+      expect(err.statusCode).to.equal(400);
+      expect(err.data).to.have.property("status");
+      expect(err.data).to.have.property("user_id");
+      expect(err.data).to.have.property("artwork_id");
+      expect(err.data).to.have.property("thumb_id");
+    }
+    let submission;
+    try {
+      submission = await Submission.query().insertAndFetch({
+        status: "wrong",
+        submitter_id: "wrong",
+        track_id: "wrong",
+        artwork_id: "wrong",
+        thumb_id: "wrong"
+      });
+    } catch (err) {
+      expect(err.statusCode).to.equal(400);
+      expect(err.data).to.have.property("status");
+      expect(err.data).to.have.property("submitter_id");
+      expect(err.data).to.have.property("track_id");
+      expect(err.data).to.have.property("artwork_id");
+      expect(err.data).to.have.property("thumb_id");
+    }
+    submission = await Submission.query().insertAndFetch({
+      submitter_id: user.id,
+      track_id: media.id,
+      artwork_id: media.id,
+      thumb_id: media.id
+    });
+    let campaign;
+    try {
+      campaign = await Campaign.query().insertAndFetch({
+        status: "wrong",
+        submitter_id: "wrong",
+        submission_id: "wrong",
+        duration: "wrong",
+        artwork_id: "wrong",
+        thumb_id: "wrong"
+      });
+    } catch (err) {
+      expect(err.statusCode).to.equal(400);
+      expect(err.data).to.have.property("status");
+      expect(err.data).to.have.property("submitter_id");
+      expect(err.data).to.have.property("submission_id");
+      expect(err.data).to.have.property("duration");
+      expect(err.data).to.have.property("artwork_id");
+      expect(err.data).to.have.property("thumb_id");
+    }
+    campaign = await Campaign.query().insertAndFetch({
+      submitter_id: user.id,
+      submission_id: submission.id,
+      duration: 3,
+      artwork_id: media.id,
+      thumb_id: media.id
+    });
+    let review;
+    try {
+      review = await Review.query().insertAndFetch({
+        status: "wrong",
+        reviewer_id: "wrong",
+        campaign_id: "wrong",
+        score: "wrong"
+      });
+    } catch (err) {
+      expect(err.statusCode).to.equal(400);
+      expect(err.data).to.have.property("status");
+      expect(err.data).to.have.property("reviewer_id");
+      expect(err.data).to.have.property("campaign_id");
+      expect(err.data).to.have.property("score");
+    }
+    review = await Review.query().insertAndFetch({
+      reviewer_id: user.id,
+      campaign_id: campaign.id,
+      score: 3
+    });
+    let request;
+    try {
+      request = await Request.query().insertAndFetch({
+        status: "wrong",
+        reviewer_id: "wrong",
+        campaign_id: "wrong",
+        credits: "wrong"
+      });
+    } catch (err) {
+      expect(err.statusCode).to.equal(400);
+      expect(err.data).to.have.property("status");
+      expect(err.data).to.have.property("reviewer_id");
+      expect(err.data).to.have.property("campaign_id");
+      expect(err.data).to.have.property("credits");
+    }
+    request = await Request.query().insertAndFetch({
+      reviewer_id: user.id,
+      campaign_id: campaign.id,
+      credits: 3
+    });
+    let comment;
+    try {
+      comment = await Comment.query().insertAndFetch({
+        status: "wrong",
+        user_id: "wrong",
+        campaign_id: "wrong"
+      });
+    } catch (err) {
+      expect(err.statusCode).to.equal(400);
+      expect(err.data).to.have.property("status");
+      expect(err.data).to.have.property("user_id");
+      expect(err.data).to.have.property("campaign_id");
+      expect(err.data).to.have.property("text");
+    }
+    comment = await Comment.query().insertAndFetch({
+      user_id: user.id,
+      campaign_id: campaign.id,
+      text: "this is a comment"
+    });
+    let credit;
+    try {
+      credit = await Credit.query().insertAndFetch({
+        status: "wrong",
+        submitter_id: "wrong",
+        campaign_id: "wrong",
+        numb_bought: "wrong",
+        numb_spent: "wrong"
+      });
+    } catch (err) {
+      expect(err.statusCode).to.equal(400);
+      expect(err.data).to.have.property("status");
+      expect(err.data).to.have.property("submitter_id");
+      expect(err.data).to.have.property("campaign_id");
+      expect(err.data).to.have.property("charge_id");
+      expect(err.data).to.have.property("numb_bought");
+      expect(err.data).to.have.property("numb_spent");
+    }
+    credit = await Credit.query().insertAndFetch({
+      submitter_id: user.id,
+      campaign_id: campaign.id,
+      charge_id: "test-charge-id",
+      price: 1.3,
+      fee: 0.2,
+      currency: "GBP",
+      numb_bought: 2,
+      numb_spent: 0
+    });
+    let debit;
+    try {
+      debit = await Debit.query().insertAndFetch({
+        status: "wrong",
+        reviewer_id: "wrong",
+        credit_id: "wrong",
+        numb_spent: "wrong"
+      });
+    } catch (err) {
+      expect(err.statusCode).to.equal(400);
+      expect(err.data).to.have.property("status");
+      expect(err.data).to.have.property("reviewer_id");
+      expect(err.data).to.have.property("credit_id");
+      expect(err.data).to.have.property("numb_spent");
+    }
+  });
 });

@@ -10,7 +10,20 @@ module.exports = class Review extends BaseModel {
     return "id";
   }
   static get jsonSchema() {
-    return {};
+    return {
+      type: "object",
+      required: ["reviewer_id", "campaign_id", "score"],
+      properties: {
+        id: { type: "integer" },
+        reviewer_id: { type: "integer" },
+        campaign_id: { type: "integer" },
+        status: {
+          type: "string",
+          enum: ["visible", "hidden", "completed", "deleted"]
+        },
+        score: { type: "integer" }
+      }
+    };
   }
   static get relationMappings() {
     return {

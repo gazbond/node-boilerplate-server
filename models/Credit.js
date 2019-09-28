@@ -1,7 +1,6 @@
 const { Model } = require("objection");
 const BaseModel = require("../library/BaseModel");
 const User = require("./User");
-const Campaign = require("./Campaign");
 
 module.exports = class Credit extends BaseModel {
   static get tableName() {
@@ -11,7 +10,28 @@ module.exports = class Credit extends BaseModel {
     return "id";
   }
   static get jsonSchema() {
-    return {};
+    return {
+      type: "object",
+      required: [
+        "submitter_id",
+        "campaign_id",
+        "charge_id",
+        "numb_bought",
+        "numb_spent"
+      ],
+      properties: {
+        id: { type: "integer" },
+        submitter_id: { type: "integer" },
+        campaign_id: { type: "integer" },
+        status: {
+          type: "string",
+          enum: ["paid", "refund"]
+        },
+        charge_id: { type: "string", maxLength: 255 },
+        numb_bought: { type: "integer" },
+        numb_spent: { type: "integer" }
+      }
+    };
   }
   static get relationMappings() {
     return {

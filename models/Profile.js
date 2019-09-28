@@ -11,7 +11,23 @@ module.exports = class Profile extends BaseModel {
     return "id";
   }
   static get jsonSchema() {
-    return {};
+    return {
+      type: "object",
+      required: ["user_id"],
+      properties: {
+        id: { type: "integer" },
+        user_id: { type: "integer" },
+        status: {
+          type: "string",
+          enum: ["visible", "hidden", "deleted"]
+        },
+        phone: { type: "string", maxLength: 32 },
+        bio: { type: "string", maxLength: 255 },
+        tags: { type: "string", maxLength: 255 },
+        artwork_id: { type: "integer" },
+        thumb_id: { type: "integer" }
+      }
+    };
   }
   static get relationMappings() {
     return {

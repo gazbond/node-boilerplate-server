@@ -16,7 +16,24 @@ module.exports = class Campaign extends BaseModel {
     return "id";
   }
   static get jsonSchema() {
-    return {};
+    return {
+      type: "object",
+      required: ["submitter_id", "submission_id", "duration"],
+      properties: {
+        id: { type: "integer" },
+        submitter_id: { type: "integer" },
+        submission_id: { type: "integer" },
+        status: {
+          type: "string",
+          enum: ["draft", "submitted", "cancelled", "completed", "deleted"]
+        },
+        description: { type: "string" },
+        tags: { type: "string", maxLength: 255 },
+        duration: { type: "integer" },
+        artwork_id: { type: "integer" },
+        thumb_id: { type: "integer" }
+      }
+    };
   }
   static get relationMappings() {
     return {

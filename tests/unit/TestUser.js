@@ -16,30 +16,14 @@ describe("Test User model", function() {
   it("tests User fails validation", async function() {
     try {
       await User.query().insertAndFetch({
-        username: "",
-        email: "not-an-email"
+        username: "invalid username",
+        email: "invalid email",
+        password: "invalid password"
       });
     } catch (error) {
-      if (error instanceof ValidationError) {
-        expect(error.data).to.have.property("username");
-        expect(error.data.username).to.eql([
-          {
-            message: "should NOT be shorter than 3 characters",
-            keyword: "minLength",
-            params: { limit: 3 }
-          }
-        ]);
-        expect(error.data).to.have.property("email");
-        expect(error.data.email).to.eql([
-          {
-            message: 'should match format "email"',
-            keyword: "format",
-            params: { format: "email" }
-          }
-        ]);
-      } else {
-        console.log(error);
-      }
+      expect(error.data).to.have.property("username");
+      expect(error.data).to.have.property("email");
+      expect(error.data).to.have.property("password");
     }
   });
   it("tests User creates timestamps and hashes on insert and update", async function() {

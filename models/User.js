@@ -30,21 +30,27 @@ class User extends BaseClass {
   static get jsonSchema() {
     return {
       type: "object",
-      required: ["username", "email"],
+      required: ["username", "email", "password"],
       properties: {
         id: { type: "integer" },
         status: {
           type: "string",
           enum: ["unconfirmed", "active", "suspended", "deleted"]
         },
-        username: { type: "string", minLength: 3, maxLength: 25 },
+        username: {
+          type: "string",
+          minLength: 3,
+          maxLength: 25,
+          pattern: "^[a-zA-Z0-9]+([_-]?[a-zA-Z0-9])*$"
+        },
         email: { type: "string", format: "email" },
         password: {
           type: "string",
           minLength: 8,
           maxLength: 60,
           pattern: "^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])"
-        }
+        },
+        auth_key: { type: "string", maxLength: 32 }
       }
     };
   }

@@ -11,7 +11,22 @@ module.exports = class Submission extends BaseModel {
     return "id";
   }
   static get jsonSchema() {
-    return {};
+    return {
+      type: "object",
+      required: ["submitter_id", "track_id"],
+      properties: {
+        id: { type: "integer" },
+        submitter_id: { type: "integer" },
+        track_id: { type: "integer" },
+        status: {
+          type: "string",
+          enum: ["visible", "hidden", "deleted"]
+        },
+        title: { type: "string", maxLength: 255 },
+        artwork_id: { type: "integer" },
+        thumb_id: { type: "integer" }
+      }
+    };
   }
   static get relationMappings() {
     return {
