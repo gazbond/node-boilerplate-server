@@ -118,5 +118,14 @@ describe("Test common model features", function() {
       .findById(debit.id);
     expect(debit.reviewer.id).to.equal(user.id);
     expect(debit.credit.id).to.equal(credit.id);
+    campaign = await Campaign.query()
+      .eager("[requests, reviews, comments]")
+      .findById(campaign.id);
+    expect(campaign.requests.length).to.equal(1);
+    expect(campaign.requests[0].id).to.equal(request.id);
+    expect(campaign.reviews.length).to.equal(1);
+    expect(campaign.reviews[0].id).to.equal(review.id);
+    expect(campaign.comments.length).to.equal(1);
+    expect(campaign.comments[0].id).to.equal(comment.id);
   });
 });
