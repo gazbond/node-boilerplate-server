@@ -35,7 +35,7 @@ module.exports = {
   models: {
     user: {
       emailConfirmation: true,
-      roles: ["user"],
+      roles: ["submitter"],
       confirmWithin: "1 week",
       recoverWithin: "1 day"
     }
