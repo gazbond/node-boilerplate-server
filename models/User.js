@@ -41,7 +41,7 @@ class User extends BaseClass {
           type: "string",
           minLength: 3,
           maxLength: 25,
-          pattern: "^[a-zA-Z0-9]+([_-]?[a-zA-Z0-9])*$"
+          pattern: "^[a-zA-Z0-9]+([_.-]?[a-zA-Z0-9])*$"
         },
         email: { type: "string", format: "email" },
         password: {
