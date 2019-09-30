@@ -15,7 +15,7 @@ describe("Test rbac models", function() {
         username: "root"
       })
       .first();
-    expect(user.roles).to.have.length(2);
+    expect(user.roles).to.have.length(3);
     // Load role and permission
     const role = await Role.query()
       .eager("permissions")
@@ -27,7 +27,7 @@ describe("Test rbac models", function() {
     await role.removePermission(permission);
     // Check removals worked
     const roles = await user.$relatedQuery("roles");
-    expect(roles).to.have.length(1);
+    expect(roles).to.have.length(2);
     const permissions = await role.$relatedQuery("permissions");
     expect(permissions).to.have.length(1);
   });
@@ -39,7 +39,7 @@ describe("Test rbac models", function() {
         username: "root"
       })
       .first();
-    expect(user.roles).to.have.length(2);
+    expect(user.roles).to.have.length(3);
     // Load role
     const role = await Role.query()
       .eager("permissions")
@@ -50,7 +50,7 @@ describe("Test rbac models", function() {
     await role.removePermission("can-read-api");
     // Check removals worked
     const roles = await user.$relatedQuery("roles");
-    expect(roles).to.have.length(1);
+    expect(roles).to.have.length(2);
     const permissions = await role.$relatedQuery("permissions");
     expect(permissions).to.have.length(1);
   });
@@ -62,18 +62,18 @@ describe("Test rbac models", function() {
         username: "root"
       })
       .first();
-    expect(user.roles).to.have.length(2);
+    expect(user.roles).to.have.length(3);
     // Load role and permission
     const role = await Role.query()
       .eager("permissions")
       .findById("admin");
     expect(role.permissions).to.have.length(2);
     // Remove roles and permissions
-    await user.removeRoles(["admin", "user"]);
+    await user.removeRoles(["admin", "reviewer"]);
     await role.removePermissions(["can-read-api", "can-write-api"]);
     // Check removals worked
     const roles = await user.$relatedQuery("roles");
-    expect(roles).to.have.length(0);
+    expect(roles).to.have.length(1);
     const permissions = await role.$relatedQuery("permissions");
     expect(permissions).to.have.length(0);
   });
