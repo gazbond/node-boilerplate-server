@@ -28,7 +28,7 @@ describe("Test UserEndpoint", async function() {
       .set("Authorization", `Bearer ${token}`);
     expect(response.status).to.equal(200);
     expect(response.body).to.be.an(Array);
-    expect(response.body.length).to.equal(2);
+    expect(response.body.length).to.equal(3);
     for (let i = 0; i < response.body.length; i++) {
       const id = response.body[i].id;
       const current = await chai
