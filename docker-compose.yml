@@ -46,6 +46,7 @@ services:
         environment:
             - cluster.name=elastic
             - bootstrap.memory_lock=true
+            - discovery.type=single-node
             - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
             - ELASTICSEARCH_USERNAME=elastic
             - ELASTICSEARCH_PASSWORD=elastic
@@ -60,6 +61,7 @@ services:
         environment:
             - cluster.name=elastictest
             - bootstrap.memory_lock=true
+            - discovery.type=single-node
             - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
             - "discovery.zen.ping.unicast.hosts=elastic"
             - ELASTICSEARCH_USERNAME=elastic
