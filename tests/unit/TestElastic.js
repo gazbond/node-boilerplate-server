@@ -206,7 +206,7 @@ describe("Test ElasticSearch", function() {
     let data = results.body.hits.hits;
     expect(data).to.be.an(Array);
     expect(data).to.have.length(1);
-    await user.$query().delete();
+    await user.delete();
     results = await elastic.search({
       index: User.indexName,
       type: User.indexType,

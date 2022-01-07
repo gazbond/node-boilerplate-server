@@ -88,7 +88,7 @@ exports.seed = async function(knex) {
   const audio = await Media.query().insertAndFetch({
     user_id: submitterUser.id,
     type: "audio",
-    url: "https://soundcloud.com/p3dals/at-heart"
+    url: "https://soundcloud.com/p3dals/98-times-bad"
   });
   const image = await Media.query().insertAndFetch({
     user_id: reviewerUser.id,

@@ -86,7 +86,7 @@ describe("Test rbac models", function() {
       .first();
     const user_id = gazbond.id;
     // Delete user
-    await gazbond.$query().delete();
+    await gazbond.delete();
     // Check assignments are gone
     const assignments = await RoleAssignment.query().where({
       user_id: user_id

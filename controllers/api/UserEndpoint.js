@@ -79,6 +79,11 @@ module.exports = class UserEndpoint extends BaseEndpoint {
       this.middleware.remove.concat(this.validators.remove),
       wrapAsync(this.actionRemoveRole)
     );
+    this.router.delete(
+      this.pathWithParam,
+      this.middleware.delete.concat(this.validators.delete),
+      wrapAsync(this.actionDelete)
+    );
     return this.router;
   }
   /**
@@ -161,6 +166,25 @@ module.exports = class UserEndpoint extends BaseEndpoint {
     });
     // 200 OK
     res.status(200).send(results);
+  }
+  /**
+   * Overloaded delete action (set status to deleted)
+   */
+   async actionDelete(req, res) {
+    const errors = validationErrors(req);
+    if (!errors.isEmpty()) {
+      // 400 Bad Request
+      return res.status(400).send(errors.mapped());
+    }
+    const id = getParam(req, "id");
+    const model = await this.Model.query().findById(id);
+    if (!model) {
+      // 404 Not Found
+      return res.status(404).end();
+    }
+    await model.delete();
+    // 200 OK
+    res.status(200).end();
   }
   /**
    * GET api/users/me

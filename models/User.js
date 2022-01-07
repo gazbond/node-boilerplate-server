@@ -13,13 +13,13 @@ const {
   baseUrl,
   models: {
     user: { emailConfirmation, roles }
-  }
+  },
+  elastic
 } = require("../config");
 const { sendEmail } = require("../library/helpers/email");
 const Role = require("./rbac/Role");
 const RoleAssignment = require("./rbac/RoleAssignment");
 const Token = require("./Token");
-
 class User extends BaseClass {
   static get tableName() {
     return "user_identity";
@@ -206,6 +206,46 @@ class User extends BaseClass {
       url: `${baseUrl}/security/password/${token.user_id}/${token.code}`
     });
   }
+   /**
+   * Delete User and remove role assignments.
+   */
+  async delete() {
+    // Load roles
+    const roles = await this.$relatedQuery("roles");
+    // Remove role assignments
+    if (roles && roles.length > 0) {
+      await this.removeRoles(roles);
+    }
+    // Load tokens
+    const tokens = await this.$relatedQuery("tokens");
+    // Remove tokens
+    if (tokens && tokens.length > 0) {
+      const deletes = [];
+      tokens.forEach(token => {
+        deletes.push([token.type, token.user_id, token.code]);
+      });
+      await Token.query()
+        .delete()
+        .whereInComposite(["type", "user_id", "code"], deletes);
+    }
+    // Set as deleted
+    await this.$query().patch({ status: "deleted" });
+    // Delete index
+    // @ts-ignore
+    const index = this.constructor.indexName;
+    if (index !== undefined) {
+      // @ts-ignore
+      const type = this.constructor.indexType || null;
+      // Delete index
+      await elastic.delete({
+        index: index,
+        type: type,
+        id: this.id,
+        refresh: true
+      });
+    }
+
+  }
   /**
    * Generate auth key, assign default role(s).
    */
@@ -228,30 +268,6 @@ class User extends BaseClass {
       await this.sendConfirmationEmail();
     }
     await super.$afterInsert(queryContext);
-  }
-  /**
-   * Remove role assignments.
-   */
-  async $beforeDelete(queryContext) {
-    await super.$beforeDelete(queryContext);
-    // Load roles
-    const roles = await this.$relatedQuery("roles");
-    // Remove role assignments
-    if (roles && roles.length > 0) {
-      await this.removeRoles(roles);
-    }
-    // Load tokens
-    const tokens = await this.$relatedQuery("tokens");
-    // Remove tokens
-    if (tokens && tokens.length > 0) {
-      const deletes = [];
-      tokens.forEach(token => {
-        deletes.push([token.type, token.user_id, token.code]);
-      });
-      await Token.query()
-        .delete()
-        .whereInComposite(["type", "user_id", "code"], deletes);
-    }
   }
 }
 
