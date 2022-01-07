@@ -11,6 +11,7 @@ const {
   wrapAsync,
   getParam,
   getField,
+  getFields,
   getHeader,
   getBody
 } = require("../../library/helpers/utils");
@@ -78,6 +79,11 @@ module.exports = class UserEndpoint extends BaseEndpoint {
       "/users/:id/role/:name",
       this.middleware.remove.concat(this.validators.remove),
       wrapAsync(this.actionRemoveRole)
+    );
+    this.router.put(
+      this.pathWithParam,
+      this.middleware.update.concat(this.validators.update),
+      wrapAsync(this.actionUpdate)
     );
     this.router.delete(
       this.pathWithParam,
@@ -168,7 +174,7 @@ module.exports = class UserEndpoint extends BaseEndpoint {
     res.status(200).send(results);
   }
   /**
-   * Overloaded delete action (set status to deleted)
+   * Overridden delete action (set status to deleted)
    */
    async actionDelete(req, res) {
     const errors = validationErrors(req);
@@ -185,6 +191,26 @@ module.exports = class UserEndpoint extends BaseEndpoint {
     await model.delete();
     // 200 OK
     res.status(200).end();
+  }
+  /**
+   * Overridden update action (ignore status deleted)
+   */
+  async actionUpdate(req, res) {
+    const errors = validationErrors(req);
+    if (!errors.isEmpty()) {
+      // 400 Bad Request
+      return res.status(400).send(errors.mapped());
+    }
+    const id = getParam(req, "id");
+    const model = await this.Model.query().findById(id);
+    if (!model || model.status == "deleted") {
+      // 404 Not Found
+      return res.status(404).end();
+    }
+    const patch = getFields(req, this.Model);
+    await model.$query().patchAndFetch(patch);
+    // 200 OK
+    res.status(200).send(model);
   }
   /**
    * GET api/users/me
