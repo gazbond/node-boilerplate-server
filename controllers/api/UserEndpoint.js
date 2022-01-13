@@ -184,7 +184,7 @@ module.exports = class UserEndpoint extends BaseEndpoint {
     }
     const id = getParam(req, "id");
     const model = await this.Model.query().findById(id);
-    if (!model) {
+    if (!model || model.status == "deleted") {
       // 404 Not Found
       return res.status(404).end();
     }
