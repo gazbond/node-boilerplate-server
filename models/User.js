@@ -63,6 +63,7 @@ class User extends BaseClass {
       "username",
       "email",
       "roles",
+      "status",
       "created_at",
       "confirmed_at",
       "updated_at"
@@ -106,6 +107,7 @@ class User extends BaseClass {
         username: { type: "text" },
         email: { type: "text" },
         roles: { type: "nested" },
+        status: { type: "text" },
         confirmed_at: { type: "date" },
         created_at: { type: "date" },
         updated_at: { type: "date" }
@@ -229,7 +231,7 @@ class User extends BaseClass {
         .whereInComposite(["type", "user_id", "code"], deletes);
     }
     // Set as deleted
-    await this.$query().patch({ status: "deleted" });
+    await this.$query().patchAndFetch({ status: "deleted" });
     // Delete index
     // @ts-ignore
     const index = this.constructor.indexName;
