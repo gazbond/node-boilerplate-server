@@ -61,7 +61,7 @@ module.exports = class BaseModel extends BaseClass {
       // @ts-ignore
       const type = this.constructor.indexType || null;
       // Update index
-      let body = getBody(this.constructor, this, true);
+      let body = getBody(this.constructor, this);
       await elastic.index({
         index: index,
         type: type,
