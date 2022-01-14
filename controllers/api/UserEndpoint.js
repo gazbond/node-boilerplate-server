@@ -103,10 +103,6 @@ module.exports = class UserEndpoint extends BaseEndpoint {
     if (sort && order) {
       return super.actionIndex(req, res);
     }
-    // Parse if not relational database
-    if (sort) {
-      sort = JSON.parse(sort);
-    }
     // Validation
     const errors = validationErrors(req);
     if (!errors.isEmpty()) {
