@@ -32,8 +32,10 @@
 ```
 # delete and recreate indexes (default)
 npm run gulp:indices
+
 # or
 npm run gulp setup_indices
+
 # or
 npm run gulp
 ```
@@ -59,7 +61,44 @@ npm run gulp re_index
 ```
 
 ```
-# read a data model and print elasticsearch mappings for its properties
-# useful for default indexMappings()
+# read a data model and print elasticsearch mappings for its properties - useful for default indexMappings()
 npm run gulp elastic_model
+```
+
+## VSCODE-COMMANDBAR
+
+
+```
+# run database migrations in development environment
+migrate
+```
+
+```
+# setup search index mappings in development environment 
+indices 
+```
+
+```
+# load database seed data in development environment
+seed
+```
+
+```
+# run acceptance tests in testing environment
+cept
+```
+
+```
+# run api tests in testing environment
+api
+```
+
+```
+# run unit tests in testing environment
+unit
+```
+
+```
+# clear tests/_output directory
+clear
 ```
