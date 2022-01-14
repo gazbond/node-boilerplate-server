@@ -191,46 +191,40 @@ describe("Test UserEndpoint", async function() {
     expect(response.body[0].id).to.not.equal(user.id);
   });
   it("test UserEndpoint 'sort' param with index", async function() {
-    // Update a timestamp
     let response = await chai
       .request(server)
       .get("/api/users/me")
       .set("Authorization", `Bearer ${token}`);
+    expect(response.status).to.equal(200);
+    id = response.body.id;
+    // Update a timestamp
     response = await chai
       .request(server)
-      .put(`/api/users/${response.body.id}`)
+      .put(`/api/users/${id}`)
       .set("Authorization", `Bearer ${token}`)
       .send({
-        email: "you@email.com"
+        email: "you2@email.com"
       });
+    expect(response.status).to.equal(200);
     // List ascending
     response = await chai
       .request(server)
       .get("/api/users")
       .set("Authorization", `Bearer ${token}`)
-      .set(
-        "X-Filter",
-        JSON.stringify({
-          bool: {
-            should: [
-              { term: { username: "root" } },
-              { term: { username: "gazbond" } }
-            ]
-          }
-        })
-      )
       .set({
-        "X-Sort": JSON.stringify({ updated_at: "desc" })
+        "X-Sort": "updated_at:asc"
       });
-    // console.log("response: ", response.body);
+    expect(response.status).to.equal(200);
+    expect(response.body[2].id).to.equal(id);
     // List descending
     response = await chai
-      .request(server)
+      .request(server) 
       .get("/api/users")
       .set("Authorization", `Bearer ${token}`)
       .set({
-        "X-Sort": JSON.stringify({ updated_at: "desc" })
+        "X-Sort": "updated_at:desc"
       });
-    // console.log("response: ", response.body);
+    expect(response.status).to.equal(200);
+    expect(response.body[0].id).to.equal(id);
   });
 });
