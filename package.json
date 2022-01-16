@@ -37,7 +37,7 @@
     "email-templates": "^5.0.4",
     "express": "^4.16.4",
     "express-ejs-layouts": "^2.5.0",
-    "express-flash": "0.0.2",
+    "express-flash": "^0.0.2",
     "express-rbac": "^1.1.1",
     "express-session": "^1.15.6",
     "express-status-monitor": "^1.2.3",
